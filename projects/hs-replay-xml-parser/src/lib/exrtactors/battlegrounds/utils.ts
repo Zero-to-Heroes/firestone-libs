@@ -6,7 +6,7 @@ export const normalizeHeroCardId = (heroCardId: string): string => {
 	// Generic handling of BG hero skins, hoping they will keep the same pattern
 	const bgHeroSkinMatch = heroCardId.match(/(.*)_SKIN_.*/);
 	if (bgHeroSkinMatch) {
-		return bgHeroSkinMatch.groups[1];
+		return bgHeroSkinMatch[1];
 	}
 
 	if (heroCardId === 'TB_BaconShop_HERO_59t') {

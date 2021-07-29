@@ -80,7 +80,16 @@ export const reparseReplay = (
 
 	const playerEntities = extractAllPlayerEntities(replay.mainPlayerId, replay.opponentPlayerId, replay.replay);
 	// console.debug('player entities', playerEntities.map(entity => entity.get('id')));
-	const mainPlayerEntityId: string = replay.replay.find('.//Player[@isMainPlayer="true"]').get('id');
+	let mainPlayerEntity = replay.replay.find('.//Player[@isMainPlayer="true"]');
+	if (!mainPlayerEntity) {
+		const players = replay.replay.findall('.//Player');
+		for (const player of players) {
+			if (player.get('accountHi') !== "0") {
+				mainPlayerEntity = player;
+			}
+		}
+	}
+	const mainPlayerEntityId: string = mainPlayerEntity.get('id');
 	// console.debug('mainPlayerEntityId', mainPlayerEntityId);
 	const playerCardIds: readonly string[] = [
 		...new Set(playerEntities.map(entity => normalizeHeroCardId(entity.get('cardID')))),
