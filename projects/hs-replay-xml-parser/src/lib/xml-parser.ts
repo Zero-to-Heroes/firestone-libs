@@ -1,3 +1,4 @@
+import { AllCardsService } from '@firestone-hs/reference-data';
 import { Element } from 'elementtree';
 import { allMinionsPlayedExtractor } from './exrtactors/all-minions-played-extractor';
 import {
@@ -19,8 +20,8 @@ import { PlayerOpponentValues } from './model/player-opponent-values';
 import { Replay } from './model/replay';
 import { buildReplayFromXml } from './replay-parser';
 
-export const parseHsReplayString = (replayString: string): Replay => {
-	return buildReplayFromXml(replayString);
+export const parseHsReplayString = (replayString: string, allCards: AllCardsService = null): Replay => {
+	return buildReplayFromXml(replayString, allCards);
 };
 
 export const extractTotalManaSpent = (replay: Replay): PlayerOpponentValues => {
