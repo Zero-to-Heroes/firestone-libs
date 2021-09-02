@@ -66,6 +66,10 @@ export const parseBattlegroundsGame = (
 };
 
 export const buildLuckFactor = (battleResultHistory: readonly BattleResultHistory[]): number => {
+	if (!battleResultHistory) {
+		return null;
+	}
+
 	const winLuckFactor = buildWinLuckFactor(battleResultHistory);
 	const tieLuckFactor = buildTieLuckFactor(battleResultHistory);
 	return (2 * winLuckFactor + tieLuckFactor) / 3;
