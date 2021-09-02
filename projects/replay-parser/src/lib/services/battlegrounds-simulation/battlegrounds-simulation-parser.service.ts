@@ -77,7 +77,7 @@ export class BattlegroundsSimulationParserService {
 			);
 		} else if (action.type === 'power-target') {
 			console.log('parsing powertargetaction', action);
-			const targetIds: readonly number[] = [action.targetEntityId];
+			const targetIds: readonly number[] = action.targetEntityIds ?? [action.targetEntityId];
 			return PowerTargetAction.create(
 				{
 					entities: this.buildEntities(action, playerEntity, opponentEntity, damages),

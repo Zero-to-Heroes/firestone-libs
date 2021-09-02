@@ -155,7 +155,7 @@ export class GameParserService {
 			}
 
 			// Battlegrounds tutorial
-			if (game.scenarioID === ScenarioId.BATTLEGROUNDS) {
+			if (game.scenarioID === ScenarioId.BATTLEGROUNDS_8P) {
 				console.log('Battlegrounds tutorial not supported, returning');
 				return [null, SMALL_PAUSE, 'Batllegrounds tutorial is not supported'];
 			}
