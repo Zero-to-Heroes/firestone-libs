@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { ScenarioId } from '@firestone-hs/reference-data';
 import { Map } from 'immutable';
 import { Observable } from 'rxjs';
 import { Game } from '../models/game/game';
@@ -155,7 +154,7 @@ export class GameParserService {
 			}
 
 			// Battlegrounds tutorial
-			if (game.scenarioID === ScenarioId.BATTLEGROUNDS_8P) {
+			if (game.scenarioID === 3539) {
 				console.log('Battlegrounds tutorial not supported, returning');
 				return [null, SMALL_PAUSE, 'Batllegrounds tutorial is not supported'];
 			}
