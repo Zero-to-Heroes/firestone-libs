@@ -21,7 +21,7 @@ export class CardDiscardAction extends Action {
 		return Object.assign(this.getInstance(), this, { entities });
 	}
 
-	public enrichWithText(): CardDiscardAction {
+	public enrichWithText(allEntitiesSoFar: Map<number, Entity>): CardDiscardAction {
 		const playerEntity = this.data.map(entityId => ActionHelper.getOwner(this.entities, entityId));
 		if (!playerEntity || playerEntity.length === 0) {
 			console.warn('[discard-action] could not find player owner', this.data);
@@ -49,7 +49,7 @@ export class CardDiscardAction extends Action {
 		}
 		const ownerName = ownerNames[0];
 		const discardedCards = this.data
-			.map(entityId => ActionHelper.getCardId(this.entities, entityId))
+			.map(entityId => ActionHelper.getCardId(this.entities, entityId, allEntitiesSoFar))
 			.map(cardId => this.allCards.getCard(cardId));
 		let discardInfo = '';
 		if (discardedCards.some(card => !card || !card.name)) {

@@ -20,9 +20,11 @@ export class PowerTargetAction extends Action implements HasTargets {
 		return Object.assign(new PowerTargetAction(this.allCards), this, { entities });
 	}
 
-	public enrichWithText(): PowerTargetAction {
-		const originCardId = ActionHelper.getCardId(this.entities, this.originId);
-		const targetCardIds = this.targetIds.map(entityId => ActionHelper.getCardId(this.entities, entityId));
+	public enrichWithText(allEntitiesSoFar: Map<number, Entity>): PowerTargetAction {
+		const originCardId = ActionHelper.getCardId(this.entities, this.originId, allEntitiesSoFar);
+		const targetCardIds = this.targetIds.map(entityId =>
+			ActionHelper.getCardId(this.entities, entityId, allEntitiesSoFar),
+		);
 		const originCardName = this.allCards.getCard(originCardId).name;
 		const cardIds = targetCardIds.map(cardId => this.allCards.getCard(cardId));
 		const targetCardNames = cardIds.some(card => !card || !card.name)
@@ -32,7 +34,7 @@ export class PowerTargetAction extends Action implements HasTargets {
 		if (this.damages) {
 			damageText = this.damages
 				.map((amount, entityId) => {
-					const entityCardId = ActionHelper.getCardId(this.entities, entityId);
+					const entityCardId = ActionHelper.getCardId(this.entities, entityId, allEntitiesSoFar);
 					const entityCard = this.allCards.getCard(entityCardId);
 					return `${entityCard.name} takes ${amount} damage`;
 				})

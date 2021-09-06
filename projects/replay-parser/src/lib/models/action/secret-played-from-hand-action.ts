@@ -21,10 +21,10 @@ export class SecretPlayedFromHandAction extends Action {
 		});
 	}
 
-	public enrichWithText(): SecretPlayedFromHandAction {
+	public enrichWithText(allEntitiesSoFar: Map<number, Entity>): SecretPlayedFromHandAction {
 		const owner = ActionHelper.getOwner(this.entities, this.entityId);
 		const ownerName: string = owner ? owner.name : '';
-		const cardId: string = ActionHelper.getCardId(this.entities, this.entityId);
+		const cardId: string = ActionHelper.getCardId(this.entities, this.entityId, allEntitiesSoFar);
 		const card = this.allCards.getCard(cardId);
 		const textRaw = `\t${ownerName} plays a secret! ${card.name}`;
 		return Object.assign(new SecretPlayedFromHandAction(this.allCards), this, {

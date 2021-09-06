@@ -18,7 +18,7 @@ export class BaconBattleOverAction extends Action {
 		});
 	}
 
-	public enrichWithText(): BaconBattleOverAction {
+	public enrichWithText(allEntitiesSoFar: Map<number, Entity>): BaconBattleOverAction {
 		return Object.assign(new BaconBattleOverAction(this.allCards), this, {
 			textRaw: 'Battle over',
 		} as BaconBattleOverAction);

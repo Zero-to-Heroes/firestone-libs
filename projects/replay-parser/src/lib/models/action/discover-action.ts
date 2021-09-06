@@ -24,11 +24,11 @@ export class DiscoverAction extends Action {
 		});
 	}
 
-	public enrichWithText(): DiscoverAction {
+	public enrichWithText(allEntitiesSoFar: Map<number, Entity>): DiscoverAction {
 		const owner = this.entities.get(this.ownerId) as PlayerEntity;
 
 		const offeredCards = this.choices
-			.map(entityId => ActionHelper.getCardId(this.entities, entityId))
+			.map(entityId => ActionHelper.getCardId(this.entities, entityId, allEntitiesSoFar))
 			.map(cardId => this.allCards.getCard(cardId));
 		let offerInfo = '';
 		// We don't have the mulligan info, so we just display the amount of cards being mulliganed
@@ -42,7 +42,7 @@ export class DiscoverAction extends Action {
 			this.chosen &&
 			this.chosen.length > 0 &&
 			this.chosen
-				.map(entityId => ActionHelper.getCardId(this.entities, entityId))
+				.map(entityId => ActionHelper.getCardId(this.entities, entityId, allEntitiesSoFar))
 				.map(cardId => this.allCards.getCard(cardId));
 		if (!chosenCards) {
 			console.warn(

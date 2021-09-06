@@ -19,8 +19,8 @@ export class QuestCompletedAction extends Action {
 		return Object.assign(this.getInstance(), this, { entities });
 	}
 
-	public enrichWithText(): QuestCompletedAction {
-		const questCardId = ActionHelper.getCardId(this.entities, this.originId);
+	public enrichWithText(allEntitiesSoFar: Map<number, Entity>): QuestCompletedAction {
+		const questCardId = ActionHelper.getCardId(this.entities, this.originId, allEntitiesSoFar);
 		const questName = this.allCards.getCard(questCardId).name;
 		const playerName = ActionHelper.getOwner(this.entities, this.originId).name;
 		const textRaw = `\t${playerName} completes ${questName}!`;

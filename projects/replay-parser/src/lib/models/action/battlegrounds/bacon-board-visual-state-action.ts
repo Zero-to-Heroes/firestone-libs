@@ -20,7 +20,7 @@ export class BaconBoardVisualStateAction extends Action {
 		});
 	}
 
-	public enrichWithText(): BaconBoardVisualStateAction {
+	public enrichWithText(allEntitiesSoFar: Map<number, Entity>): BaconBoardVisualStateAction {
 		const textRaw = this.newState === 1 ? 'Recruit' : 'Combat';
 		return Object.assign(new BaconBoardVisualStateAction(this.allCards), this, {
 			textRaw,

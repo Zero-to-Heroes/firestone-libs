@@ -25,8 +25,8 @@ export class AttachingEnchantmentAction extends Action implements HasTargets {
 		});
 	}
 
-	public enrichWithText(): AttachingEnchantmentAction {
-		const creatorCardId = ActionHelper.getCardId(this.entities, this.originId);
+	public enrichWithText(allEntitiesSoFar: Map<number, Entity>): AttachingEnchantmentAction {
+		const creatorCardId = ActionHelper.getCardId(this.entities, this.originId, allEntitiesSoFar);
 		const creatorCard = this.allCards.getCard(creatorCardId);
 		const enchantmentCard = this.allCards.getCard(this.enchantmentCardId);
 		const targetCardNames = this.targetIds

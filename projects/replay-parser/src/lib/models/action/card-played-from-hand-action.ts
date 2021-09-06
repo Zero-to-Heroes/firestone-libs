@@ -22,17 +22,17 @@ export class CardPlayedFromHandAction extends Action {
 		});
 	}
 
-	public enrichWithText(): CardPlayedFromHandAction {
+	public enrichWithText(allEntitiesSoFar: Map<number, Entity>): CardPlayedFromHandAction {
 		const ownerName: string = ActionHelper.getOwner(this.entities, this.entityId).name;
 		const cardEntity = this.entities.get(this.entityId);
-		const cardId: string = ActionHelper.getCardId(this.entities, this.entityId);
+		const cardId: string = ActionHelper.getCardId(this.entities, this.entityId, allEntitiesSoFar);
 		const card = this.allCards.getCard(cardId);
 		const cardName = card ? card.name : 'one card';
 		let playVerb = 'plays';
 		if (cardEntity.getTag(GameTag.CARDTYPE) === CardType.WEAPON) {
 			playVerb = 'equips';
 		}
-		const targetText = super.generateTargetsText();
+		const targetText = super.generateTargetsText(allEntitiesSoFar);
 		const targetTextToDisplay = targetText && targetText.length > 0 ? `\n${targetText}` : '';
 		const textRaw = `\t${ownerName} ${playVerb} ${cardName}${targetTextToDisplay}`;
 		// if (this.entityId === 38) {

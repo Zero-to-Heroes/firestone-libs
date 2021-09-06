@@ -21,9 +21,9 @@ export class DiscoveryPickAction extends Action {
 		});
 	}
 
-	public enrichWithText(): DiscoveryPickAction {
+	public enrichWithText(allEntitiesSoFar: Map<number, Entity>): DiscoveryPickAction {
 		const ownerEntity = ActionHelper.getOwner(this.entities, this.owner);
-		const choiceCardId = ActionHelper.getCardId(this.entities, this.choice);
+		const choiceCardId = ActionHelper.getCardId(this.entities, this.choice, allEntitiesSoFar);
 		let chosenCardText = 'one card';
 		if (choiceCardId) {
 			chosenCardText = this.allCards.getCard(choiceCardId).name;

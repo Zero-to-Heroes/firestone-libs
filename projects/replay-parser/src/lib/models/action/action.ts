@@ -32,7 +32,9 @@ export abstract class Action {
 
 	protected abstract getInstance(): Action;
 	abstract update(entities: Map<number, Entity>): Action;
-	abstract enrichWithText(): Action;
+	// The list of entities is useful when trying to find the name of an entity that died,
+	// but whose deathrattle effect triggers and is logged in text
+	abstract enrichWithText(allEntitiesSoFar: Map<number, Entity>): Action;
 
 	constructor(protected readonly allCards?: AllCardsService) {}
 
@@ -40,13 +42,15 @@ export abstract class Action {
 		return Object.assign(this.getInstance(), this, newAction);
 	}
 
-	protected generateTargetsText(): string {
+	protected generateTargetsText(allEntitiesSoFar: Map<number, Entity>): string {
 		if (!this.targetIds || this.targetIds.length === 0) {
 			return null;
 		}
-		const originCardId = ActionHelper.getCardId(this.entities, this.originId);
+		const originCardId = ActionHelper.getCardId(this.entities, this.originId, allEntitiesSoFar);
 		const originCardName = this.allCards.getCard(originCardId).name;
-		const targetCardIds = this.targetIds.map(entityId => ActionHelper.getCardId(this.entities, entityId));
+		const targetCardIds = this.targetIds.map(entityId =>
+			ActionHelper.getCardId(this.entities, entityId, allEntitiesSoFar),
+		);
 		const cardIds = targetCardIds.map(cardId => this.allCards.getCard(cardId));
 		const targetCardNames = cardIds.some(card => !card || !card.name)
 			? `${cardIds.length} cards`
@@ -55,7 +59,7 @@ export abstract class Action {
 		if (this.damages) {
 			damageText = this.damages
 				.map((amount, entityId) => {
-					const entityCardId = ActionHelper.getCardId(this.entities, entityId);
+					const entityCardId = ActionHelper.getCardId(this.entities, entityId, allEntitiesSoFar);
 					const entityCard = this.allCards.getCard(entityCardId);
 					return `${entityCard.name} takes ${amount} damage`;
 				})

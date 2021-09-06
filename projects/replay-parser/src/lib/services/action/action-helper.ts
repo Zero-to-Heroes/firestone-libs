@@ -20,11 +20,19 @@ export class ActionHelper {
 		return owner as PlayerEntity;
 	}
 
-	public static getCardId(entities: Map<number, Entity>, entityId: number): string {
+	public static getCardId(entities: Map<number, Entity>, entityId: number, allEntitiesSoFar: Map<number, Entity>): string {
 		const entity = entities.get(entityId);
 		if (entity && entity.cardID) {
 			return entity.cardID;
 		}
+
+		if (allEntitiesSoFar) {
+			const entitySoFar = allEntitiesSoFar.get(entityId);
+			if (entitySoFar && entitySoFar.cardID) {
+				return entitySoFar.cardID;
+			} 
+		}
+
 		// Otherwise, this can happen when we're targeting a player entity, which doesn't have a card id
 		if (!(entity instanceof PlayerEntity)) {
 			// Since we don't always know the entity id, it is often correct to say we don't know

@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { Map } from 'immutable';
+import { Entity } from '../../models/game/entity';
 import { Game } from '../../models/game/game';
 
 @Injectable({
@@ -12,9 +14,11 @@ export class NarratorService {
 		const numberOfTurns = turnsWithActions.size;
 		// // console.log('getting turn', i, game.turns.toJS());
 		const turn = game.turns.get(numberOfTurns - 1);
+		let allEntitiesSoFar: Map<number, Entity> = Map.of();
 		const enrichedActions = turn.actions.map(action => {
 			try {
-				return action.enrichWithText();
+				allEntitiesSoFar = allEntitiesSoFar.merge(action.entities);
+				return action.enrichWithText(allEntitiesSoFar);
 			} catch (e) {
 				console.warn('Could not enrich action with text', e, action);
 				return action;

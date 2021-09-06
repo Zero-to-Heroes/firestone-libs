@@ -23,15 +23,17 @@ export class MulliganCardAction extends Action {
 		});
 	}
 
-	public enrichWithText(): MulliganCardAction {
+	public enrichWithText(allEntitiesSoFar: Map<number, Entity>): MulliganCardAction {
 		const textRaw =
-			this.buildMulliganText(this.playerMulligan) + '\n' + this.buildMulliganText(this.opponentMulligan);
+			this.buildMulliganText(this.playerMulligan, allEntitiesSoFar) +
+			'\n' +
+			this.buildMulliganText(this.opponentMulligan, allEntitiesSoFar);
 		return Object.assign(new MulliganCardAction(this.allCards), this, {
 			textRaw,
 		});
 	}
 
-	private buildMulliganText(cards: readonly number[]): string {
+	private buildMulliganText(cards: readonly number[], allEntitiesSoFar: Map<number, Entity>): string {
 		if (!cards || cards.length === 0) {
 			return '';
 		}
@@ -46,7 +48,7 @@ export class MulliganCardAction extends Action {
 		}
 		const ownerName = ownerNames[0];
 		const mulliganedCards = cards
-			.map(entityId => ActionHelper.getCardId(this.entities, entityId))
+			.map(entityId => ActionHelper.getCardId(this.entities, entityId, allEntitiesSoFar))
 			.map(cardId => this.allCards.getCard(cardId));
 		let mulliganInfo = '';
 		// We don't have the mulligan info, so we just display the amount of cards being mulliganed

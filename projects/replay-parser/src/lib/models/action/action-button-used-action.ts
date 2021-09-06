@@ -21,14 +21,16 @@ export class ActionButtonUsedAction extends Action {
 		});
 	}
 
-	public enrichWithText(): ActionButtonUsedAction {
+	public enrichWithText(allEntitiesSoFar: Map<number, Entity>): ActionButtonUsedAction {
 		const ownerName: string = ActionHelper.getOwner(this.entities, this.entityId).name;
-		const cardId: string = ActionHelper.getCardId(this.entities, this.entityId);
+		const cardId: string = ActionHelper.getCardId(this.entities, this.entityId, allEntitiesSoFar);
 		const card = this.allCards.getCard(cardId);
 		const verb = this.buildVerb(card);
 		let actionTarget = '';
 		if (this.targetIds && this.targetIds.length > 0) {
-			const targetCardIds = this.targetIds.map(entityId => ActionHelper.getCardId(this.entities, entityId));
+			const targetCardIds = this.targetIds.map(entityId =>
+				ActionHelper.getCardId(this.entities, entityId, allEntitiesSoFar),
+			);
 			const cardIds = targetCardIds.map(cardId => this.allCards.getCard(cardId));
 			const targetCardNames = cardIds.some(card => !card || !card.name)
 				? `${cardIds.length} cards`

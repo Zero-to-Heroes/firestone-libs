@@ -23,9 +23,11 @@ export class CardTargetAction extends Action implements HasTargets {
 		});
 	}
 
-	public enrichWithText(): CardTargetAction {
-		const originCardId = ActionHelper.getCardId(this.entities, this.originId);
-		const targetCardIds = this.targetIds.map(entityId => ActionHelper.getCardId(this.entities, entityId));
+	public enrichWithText(allEntitiesSoFar: Map<number, Entity>): CardTargetAction {
+		const originCardId = ActionHelper.getCardId(this.entities, this.originId, allEntitiesSoFar);
+		const targetCardIds = this.targetIds.map(entityId =>
+			ActionHelper.getCardId(this.entities, entityId, allEntitiesSoFar),
+		);
 		const originCardName = this.allCards.getCard(originCardId).name;
 		const targetCardNames = targetCardIds
 			.map(cardId => this.allCards.getCard(cardId))

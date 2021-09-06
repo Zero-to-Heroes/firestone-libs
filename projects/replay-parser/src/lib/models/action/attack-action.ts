@@ -23,16 +23,16 @@ export class AttackAction extends Action implements HasTarget {
 		});
 	}
 
-	public enrichWithText(): AttackAction {
-		const originCardId = ActionHelper.getCardId(this.entities, this.originId);
-		const targetCardId = ActionHelper.getCardId(this.entities, this.targetId);
+	public enrichWithText(allEntitiesSoFar: Map<number, Entity>): AttackAction {
+		const originCardId = ActionHelper.getCardId(this.entities, this.originId, allEntitiesSoFar);
+		const targetCardId = ActionHelper.getCardId(this.entities, this.targetId, allEntitiesSoFar);
 		const originCard = this.allCards.getCard(originCardId);
 		const targetCard = this.allCards.getCard(targetCardId);
 		let damageText = '';
 		if (this.damages) {
 			damageText = this.damages
 				.map((amount, entityId) => {
-					const entityCardId = ActionHelper.getCardId(this.entities, entityId);
+					const entityCardId = ActionHelper.getCardId(this.entities, entityId, allEntitiesSoFar);
 					const entityCard = this.allCards.getCard(entityCardId);
 					return `${entityCard.name} takes ${amount} damage`;
 				})

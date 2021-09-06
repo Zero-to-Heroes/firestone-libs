@@ -19,7 +19,7 @@ export class MulliganCardChoiceAction extends Action {
 		return Object.assign(new MulliganCardChoiceAction(this.allCards), this, { entities });
 	}
 
-	public enrichWithText(): MulliganCardChoiceAction {
+	public enrichWithText(allEntitiesSoFar: Map<number, Entity>): MulliganCardChoiceAction {
 		const textRaw = '';
 		return Object.assign(new MulliganCardChoiceAction(this.allCards), this, { textRaw });
 	}

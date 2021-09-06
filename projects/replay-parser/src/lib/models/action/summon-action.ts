@@ -21,11 +21,12 @@ export class SummonAction extends Action {
 		});
 	}
 
-	public enrichWithText(): SummonAction {
-		const originCardId = ActionHelper.getCardId(this.entities, this.originId);
+	public enrichWithText(allEntitiesSoFar: Map<number, Entity>): SummonAction {
+		const originCardId = ActionHelper.getCardId(this.entities, this.originId, allEntitiesSoFar);
+		console.log('enriching summon', this.originId, originCardId);
 		const originCardName = this.allCards.getCard(originCardId).name;
 		const summonCardNames = this.entityIds
-			.map(entityId => ActionHelper.getCardId(this.entities, entityId))
+			.map(entityId => ActionHelper.getCardId(this.entities, entityId, allEntitiesSoFar))
 			.map(cardId => this.allCards.getCard(cardId).name)
 			.join(', ');
 		const textRaw = `\t${originCardName} summons ${summonCardNames}`;

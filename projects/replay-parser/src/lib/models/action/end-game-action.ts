@@ -22,7 +22,7 @@ export class EndGameAction extends Action {
 		return Object.assign(this.getInstance(), this, { entities });
 	}
 
-	public enrichWithText(): EndGameAction {
+	public enrichWithText(allEntitiesSoFar: Map<number, Entity>): EndGameAction {
 		let concededText = '';
 		for (const status of this.winStatus) {
 			if (status[1] === PlayState.CONCEDED) {

@@ -21,8 +21,8 @@ export class SecretRevealedAction extends Action {
 		});
 	}
 
-	public enrichWithText(): SecretRevealedAction {
-		const cardId = ActionHelper.getCardId(this.entities, this.entityId);
+	public enrichWithText(allEntitiesSoFar: Map<number, Entity>): SecretRevealedAction {
+		const cardId = ActionHelper.getCardId(this.entities, this.entityId, allEntitiesSoFar);
 		const cardName = this.allCards.getCard(cardId).name;
 		const textRaw = `\t... which triggers ${cardName}!`;
 		return Object.assign(new SecretRevealedAction(this.allCards), this, {

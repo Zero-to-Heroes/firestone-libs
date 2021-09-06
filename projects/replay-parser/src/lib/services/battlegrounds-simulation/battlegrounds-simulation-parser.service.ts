@@ -76,7 +76,7 @@ export class BattlegroundsSimulationParserService {
 				this.allCards,
 			);
 		} else if (action.type === 'power-target') {
-			console.log('parsing powertargetaction', action);
+			// console.log('parsing powertargetaction', action);
 			const targetIds: readonly number[] = action.targetEntityIds ?? [action.targetEntityId];
 			return PowerTargetAction.create(
 				{
@@ -90,6 +90,7 @@ export class BattlegroundsSimulationParserService {
 		} else if (action.type === 'spawn') {
 			return SummonAction.create(
 				{
+					originId: action.sourceEntityId,
 					entities: this.buildEntities(action, playerEntity, opponentEntity, null),
 					entityIds: action.spawns.map(entity => entity.entityId) as readonly number[],
 				} as SummonAction,

@@ -21,9 +21,9 @@ export class MinionDeathAction extends Action {
 		});
 	}
 
-	public enrichWithText(): MinionDeathAction {
+	public enrichWithText(allEntitiesSoFar: Map<number, Entity>): MinionDeathAction {
 		const deadMinionNames = this.deadMinions
-			.map(entityId => ActionHelper.getCardId(this.entities, entityId))
+			.map(entityId => ActionHelper.getCardId(this.entities, entityId, allEntitiesSoFar))
 			.map(cardId => this.allCards.getCard(cardId))
 			.map(card => card.name)
 			.join(', ');

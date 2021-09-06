@@ -20,7 +20,7 @@ export class FatigueDamageAction extends Action {
 		return Object.assign(this.getInstance(), this, { entities });
 	}
 
-	public enrichWithText(): FatigueDamageAction {
+	public enrichWithText(allEntitiesSoFar: Map<number, Entity>): FatigueDamageAction {
 		const playerName = ActionHelper.getOwner(this.entities, this.controller).name;
 		const textRaw = `\t${playerName} takes ${this.amount} fatigue damage`;
 		return Object.assign(this.getInstance(), this, { textRaw });

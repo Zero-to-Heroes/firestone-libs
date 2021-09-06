@@ -19,12 +19,12 @@ export class HealingAction extends Action {
 		});
 	}
 
-	public enrichWithText(): HealingAction {
+	public enrichWithText(allEntitiesSoFar: Map<number, Entity>): HealingAction {
 		const textRaw =
 			'\t' +
 			this.damages
 				.map((amount, entityId) => {
-					const entityCardId = ActionHelper.getCardId(this.entities, entityId);
+					const entityCardId = ActionHelper.getCardId(this.entities, entityId, allEntitiesSoFar);
 					const entityCard = this.allCards.getCard(entityCardId);
 					return `${entityCard.name} heals for ${-amount}`;
 				})

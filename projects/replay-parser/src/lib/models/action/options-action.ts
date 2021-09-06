@@ -18,7 +18,7 @@ export class OptionsAction extends Action {
 		return Object.assign(this.getInstance(), this, { entities });
 	}
 
-	public enrichWithText(): OptionsAction {
+	public enrichWithText(allEntitiesSoFar: Map<number, Entity>): OptionsAction {
 		const textRaw = '';
 		return Object.assign(this.getInstance(), this, { textRaw });
 	}

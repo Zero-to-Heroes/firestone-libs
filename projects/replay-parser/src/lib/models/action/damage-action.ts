@@ -19,12 +19,12 @@ export class DamageAction extends Action {
 		});
 	}
 
-	public enrichWithText(): DamageAction {
+	public enrichWithText(allEntitiesSoFar: Map<number, Entity>): DamageAction {
 		const textRaw =
 			'\t' +
 			this.damages
 				.map((amount, entityId) => {
-					const entityCardId = ActionHelper.getCardId(this.entities, entityId);
+					const entityCardId = ActionHelper.getCardId(this.entities, entityId, allEntitiesSoFar);
 					const entityCard = this.allCards.getCard(entityCardId);
 					return `${entityCard.name} takes ${amount} damage`;
 				})

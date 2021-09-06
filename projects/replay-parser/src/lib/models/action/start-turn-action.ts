@@ -19,7 +19,7 @@ export class StartTurnAction extends Action {
 		return Object.assign(this.getInstance(), this, { entities });
 	}
 
-	public enrichWithText(): StartTurnAction {
+	public enrichWithText(allEntitiesSoFar: Map<number, Entity>): StartTurnAction {
 		const textRaw = this.isHeroSelection
 			? 'Hero selection'
 			: this.isMulligan
