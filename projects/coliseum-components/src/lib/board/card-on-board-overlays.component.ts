@@ -29,6 +29,9 @@ export class CardOnBoardOverlaysComponent {
 		if (value.getTag(GameTag.DIVINE_SHIELD) === 1) {
 			this.pushOverlay('minion_divine_shield');
 		}
+		if (value.getTag(GameTag.REBORN) === 1) {
+			this.pushOverlay('minion_reborn');
+		}
 		if (value.getTag(GameTag.SILENCED) === 1) {
 			this.pushOverlay('minion_silenced'); // missing
 		}

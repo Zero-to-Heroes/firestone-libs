@@ -189,14 +189,14 @@ export class BattlegroundsSimulationParserService {
 			[GameTag[GameTag.CARDTYPE]]: CardType.MINION,
 			[GameTag[GameTag.ZONE]]: Zone.PLAY,
 			[GameTag[GameTag.ZONE_POSITION]]: boardPosition,
-			// [GameTag[GameTag.PREMIUM]]: boardEntity.premium,
 			[GameTag[GameTag.ATK]]: boardEntity.attack,
 			[GameTag[GameTag.HEALTH]]: boardEntity.health,
-			// [GameTag[GameTag.DAMAGE]]: boardEntity.damage,
 			[GameTag[GameTag.TAUNT]]: boardEntity.taunt ? 1 : 0,
 			[GameTag[GameTag.POISONOUS]]: boardEntity.poisonous ? 1 : 0,
 			[GameTag[GameTag.DIVINE_SHIELD]]: boardEntity.divineShield ? 1 : 0,
+			[GameTag[GameTag.REBORN]]: boardEntity.reborn ? 1 : 0,
 			[GameTag[GameTag.WINDFURY]]: boardEntity.windfury || boardEntity.megaWindfury ? 1 : 0,
+			[GameTag[GameTag.PREMIUM]]: this.allCards.getCard(boardEntity.cardId).battlegroundsNormalDbfId ? 1 : 0,
 		});
 		return Entity.create({
 			id: boardEntity.entityId,
