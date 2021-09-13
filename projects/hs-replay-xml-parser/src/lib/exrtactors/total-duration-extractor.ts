@@ -13,7 +13,8 @@ export const totalDurationExtractor = (replay: Replay): number => {
 };
 
 export const numberOfTurnsExtractor = (replay: Replay): number => {
-	const allTurnChanges = replay.replay.findall(`.//TagChange[@tag='${GameTag.TURN}']`);
+	const gameEntityId = replay.replay.find('.//GameEntity').get('id');
+	const allTurnChanges = replay.replay.findall(`.//TagChange[@tag='${GameTag.TURN}'][@entity='${gameEntityId}']`);
 	const lastTurn = allTurnChanges.length > 0 ? allTurnChanges[allTurnChanges.length - 1] : null;
 	const totalTurns = lastTurn ? parseInt(lastTurn.get('value')) : 0;
 	return Math.ceil(totalTurns / 2);
