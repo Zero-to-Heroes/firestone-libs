@@ -5,7 +5,7 @@ import { Damage, GameAction } from '@firestone-hs/simulate-bgs-battle/dist/simul
 import { GameSample } from '@firestone-hs/simulate-bgs-battle/dist/simulation/spectator/game-sample';
 import { Map } from 'immutable';
 import { Game } from '../../models/game/game';
-import { Action, ActionParserConfig, ActionTurn, AttackAction, DamageAction, Entity, MinionDeathAction, PlayerEntity, PowerTargetAction, SummonAction, Turn } from '../../models/models';
+import { Action, ActionParserConfig, ActionTurn, AttackAction, DamageAction, Entity, MinionDeathAction, PlayerEntity, PowerTargetAction, StartTurnAction, SummonAction, Turn } from '../../models/models';
 import { AllCardsService } from '../all-cards.service';
 import { NarratorService } from '../gamepipeline/narrator.service';
 import { ExtendedGameSample } from './extended-game-sample';
@@ -53,8 +53,43 @@ export class BattlegroundsSimulationParserService {
 	}
 
 	private buildGameAction(action: GameAction, playerEntity: PlayerEntity, opponentEntity: PlayerEntity): Action {
-		const damages = this.buildDamages(action.damages);
-		if (action.type === 'attack') {
+		const damages = this.buildDamages(action.type, action.damages, playerEntity, opponentEntity);
+		if (action.type === 'start-of-combat') {
+			const result = StartTurnAction.create(
+				{
+					entities: this.buildEntities(action, playerEntity, opponentEntity, damages),
+				} as StartTurnAction,
+				this.allCards,
+			);
+			// console.log('built attack action', result, result.entities.toJS());
+			return result;
+		} else if (action.type === 'player-attack') {
+			const result = AttackAction.create(
+				{
+					entities: this.buildEntities(action, playerEntity, opponentEntity, damages),
+					originId: playerEntity.id,
+					targetId: opponentEntity.id,
+					targets: [[playerEntity.id, opponentEntity.id]] as readonly number[][],
+					damages: damages,
+				} as AttackAction,
+				this.allCards,
+			);
+			// console.log('built attack action', result, result.entities.toJS());
+			return result;
+		} else if (action.type === 'opponent-attack') {
+			const result = AttackAction.create(
+				{
+					entities: this.buildEntities(action, playerEntity, opponentEntity, damages),
+					originId: opponentEntity.id,
+					targetId: playerEntity.id,
+					targets: [[opponentEntity.id, playerEntity.id]] as readonly number[][],
+					damages: damages
+				} as AttackAction,
+				this.allCards,
+			);
+			// console.log('built attack action', result, result.entities.toJS());
+			return result;
+		} else if (action.type === 'attack') {
 			const result = AttackAction.create(
 				{
 					entities: this.buildEntities(action, playerEntity, opponentEntity, damages),
@@ -107,10 +142,19 @@ export class BattlegroundsSimulationParserService {
 		}
 	}
 
-	private buildDamages(damages: Damage[]): Map<number, number> {
+	private buildDamages(actionType: string, damages: Damage[], playerEntity: PlayerEntity, opponentEntity: PlayerEntity): Map<number, number> {
 		if (!damages || damages.length === 0) {
 			return null;
 		}
+
+		if (actionType === 'player-attack') {
+			const damage = !!damages?.length ? damages[0].damage ?? 0 ! : 0;
+			return Map([[opponentEntity.id, damage]]);
+		} else if (actionType === 'opponent-attack') {
+			const damage = !!damages?.length ? damages[0].damage ?? 0 ! : 0;
+			return Map([[playerEntity.id, damage]]);
+		}
+
 		const result: { [damagedEntityId: number]: number } = {};
 		for (const damage of damages) {
 			result[damage.targetEntityId] = (result[damage.targetEntityId] || 0) + damage.damage;
@@ -156,8 +200,18 @@ export class BattlegroundsSimulationParserService {
 					damages,
 				),
 			);
+			
 		// console.log('split entities', friendlyEntities, opponentEntities);
-		const allEntities: readonly Entity[] = [playerEntity, opponentEntity, ...friendlyEntities, ...opponentEntities];
+		const allEntities: readonly Entity[] = [
+			Object.assign(new PlayerEntity(), playerEntity, { 
+				damageForThisAction: damages && damages.get(playerEntity.id) ? damages.get(playerEntity.id) : undefined 
+			} as PlayerEntity), 
+			Object.assign(new PlayerEntity(), opponentEntity, { 
+				damageForThisAction: damages && damages.get(opponentEntity.id) ? damages.get(opponentEntity.id) : undefined 
+			} as PlayerEntity), 
+			...friendlyEntities, 
+			...opponentEntities
+		];
 		const mapEntries = allEntities.map(entity => [entity.id, entity]);
 		// console.log('map entries', mapEntries);
 		const result: Map<number, Entity> = Map(mapEntries);
@@ -190,7 +244,8 @@ export class BattlegroundsSimulationParserService {
 			[GameTag[GameTag.ZONE]]: Zone.PLAY,
 			[GameTag[GameTag.ZONE_POSITION]]: boardPosition,
 			[GameTag[GameTag.ATK]]: boardEntity.attack,
-			[GameTag[GameTag.HEALTH]]: boardEntity.health,
+			[GameTag[GameTag.HEALTH]]: boardEntity.maxHealth ?? boardEntity.health,
+			[GameTag[GameTag.DAMAGE]]:( boardEntity.maxHealth ?? boardEntity.health) - boardEntity.health,
 			[GameTag[GameTag.TAUNT]]: boardEntity.taunt ? 1 : 0,
 			[GameTag[GameTag.POISONOUS]]: boardEntity.poisonous ? 1 : 0,
 			[GameTag[GameTag.DIVINE_SHIELD]]: boardEntity.divineShield ? 1 : 0,
