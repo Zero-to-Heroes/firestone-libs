@@ -1,4 +1,5 @@
-import { GameTag } from '@firestone-hs/reference-data';
+import { GameTag, Step } from '@firestone-hs/reference-data';
+import { isMercenaries } from '../hs-utils';
 import { Replay } from '../model/replay';
 
 export const totalDurationExtractor = (replay: Replay): number => {
@@ -14,10 +15,19 @@ export const totalDurationExtractor = (replay: Replay): number => {
 
 export const numberOfTurnsExtractor = (replay: Replay): number => {
 	const gameEntityId = replay.replay.find('.//GameEntity').get('id');
-	const allTurnChanges = replay.replay.findall(`.//TagChange[@tag='${GameTag.TURN}'][@entity='${gameEntityId}']`);
-	const lastTurn = allTurnChanges.length > 0 ? allTurnChanges[allTurnChanges.length - 1] : null;
-	const totalTurns = lastTurn ? parseInt(lastTurn.get('value')) : 0;
-	return Math.ceil(totalTurns / 2);
+	// There is no back and forth in mercenaries
+	if (isMercenaries(replay.gameType)) {
+		const allTurnChanges = replay.replay.findall(
+			`.//TagChange[@tag='${GameTag.STEP}'][@value='${Step.MAIN_PRE_ACTION}']`,
+		);
+		return allTurnChanges.length;
+	} else {
+		const allTurnChanges = replay.replay.findall(`.//TagChange[@tag='${GameTag.TURN}'][@entity='${gameEntityId}']`);
+		const lastTurn = allTurnChanges.length > 0 ? allTurnChanges[allTurnChanges.length - 1] : null;
+		const totalTurns = lastTurn ? parseInt(lastTurn.get('value')) : 0;
+		// There is no back and forth in mercenaries
+		return Math.ceil(totalTurns / 2);
+	}
 };
 
 const toTimestamp = (ts: string): number => {

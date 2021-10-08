@@ -26,6 +26,6 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 rm -rf dist && tsc && 'cp' -rf dist/ /e/Source/zerotoheroes/firestone/core/node_modules/\@firestone-hs/hs-replay-xml-parser/
 
-rm -rf dist && tsc && 'cp' -rf dist/ /e/Source/zerotoheroes/firestone/integration-tests/node_modules/\@firestone-hs/hs-replay-xml-parser/
+rm -rf dist && tsc && 'cp' -rf dist/ /e/Source/zerotoheroes/public-lambdas/trigger-build-match-stats/node_modules/\@firestone-hs/hs-replay-xml-parser/
 
 rm -rf dist && tsc && npm publish --access public

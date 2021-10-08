@@ -58,9 +58,11 @@ export const buildReplayFromXml = (replayString: string, allCards: AllCardsServi
 	return Object.assign(new Replay(), {
 		replay: elementTree,
 		mainPlayerId: mainPlayerId,
+		mainPlayerEntityId: +mainPlayerEntityId,
 		mainPlayerName: mainPlayerName,
 		mainPlayerCardId: mainPlayerCardId,
 		opponentPlayerId: opponentPlayerId,
+		opponentPlayerEntityId: +opponentPlayerEntityId,
 		opponentPlayerName: opponentPlayerName,
 		opponentPlayerCardId: opponentPlayerCardId,
 		region: region,
@@ -79,7 +81,11 @@ const extractPlayerCardId = (
 	elementTree: ElementTree,
 	allCards: AllCardsService = null,
 ): string => {
-	const heroEntityId = playerElement.find(`.//Tag[@tag='${GameTag.HERO_ENTITY}']`).get('value');
+	const heroEntityId = playerElement.find(`.//Tag[@tag='${GameTag.HERO_ENTITY}']`)?.get('value');
+	// Mercenaries don't have a hero entity id
+	if (!heroEntityId) {
+		return null;
+	}
 	const heroEntity = elementTree.find(`.//FullEntity[@id='${heroEntityId}']`);
 	let cardId = heroEntity.get('cardID');
 	// Battlegrounds assigns TB_BaconShop_HERO_PH at the start and then changes to the real hero
@@ -94,7 +100,7 @@ const extractPlayerCardId = (
 
 	if (allCards) {
 		const heroCreatorDbfId =heroEntity.find(`.Tag[@tag='${GameTag.CREATOR_DBID}']`);
-		if (heroCreatorDbfId && +heroCreatorDbfId.get('value') === allCards.getCard(CardIds.Collectible.Rogue.MaestraOfTheMasquerade).dbfId) {
+		if (heroCreatorDbfId && +heroCreatorDbfId.get('value') === allCards.getCard(CardIds.MaestraOfTheMasquerade).dbfId) {
 			const heroControllerId = heroEntity.find(`.Tag[@tag='${GameTag.CONTROLLER}']`).get('value');
 			const heroRevealed = elementTree
 				.findall(`.//FullEntity`)
@@ -106,7 +112,7 @@ const extractPlayerCardId = (
 			if (heroRevealed.length > 0) {
 				cardId = heroRevealed[heroRevealed.length - 1].get('cardID');
 			} else {
-				cardId = CardIds.Collectible.Rogue.ValeeraSanguinarHeroSkins;
+				cardId = CardIds.ValeeraSanguinarHeroSkins;
 			}
 		}
 	}	
@@ -148,12 +154,14 @@ const extractPlayerCardId = (
 };
 
 const extractResult = (mainPlayerEntityId: string, elementTree: ElementTree): string => {
-	const winChange = elementTree.find(`.//TagChange[@tag='${GameTag.PLAYSTATE}'][@value='${PlayState.WON}']`);
-	if (!winChange) {
+	const winChanges = elementTree.findall(`.//TagChange[@tag='${GameTag.PLAYSTATE}'][@value='${PlayState.WON}']`);
+	if (!winChanges?.length) {
 		const tieChange = elementTree.find(`.//TagChange[@tag='${GameTag.PLAYSTATE}'][@value='${PlayState.TIED}']`);
 		return tieChange ? 'tied' : 'unknown';
 	}
-	return mainPlayerEntityId === winChange.get('entity') ? 'won' : 'lost';
+	// Because mercenaries introduce another player that mimics the main player, but with another 
+	// entity ID, we need to look at all the tags
+	return winChanges.some(winChange =>  mainPlayerEntityId === winChange.get('entity')) ? 'won' : 'lost';
 };
 
 const extarctPlayCoin = (mainPlayerEntityId: string, elementTree: ElementTree): string => {
