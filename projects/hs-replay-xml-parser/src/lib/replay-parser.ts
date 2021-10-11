@@ -28,9 +28,7 @@ export const buildReplayFromXml = (replayString: string, allCards: AllCardsServi
 		.toJSNumber();
 	// console.log('mainPlayer');
 
-	const opponentPlayerElement =
-		elementTree.findall('.//Player').find(player => player.get('isMainPlayer') === 'false') ||
-		elementTree.findall('.//Player')[1];
+	const opponentPlayerElement = [...elementTree.findall(`.//Player[@isMainPlayer="false"]`)].pop();
 	const opponentPlayerId = parseInt(opponentPlayerElement.get('playerID'));
 	const opponentPlayerName = opponentPlayerElement.get('name');
 	const opponentPlayerEntityId = opponentPlayerElement.get('id');
