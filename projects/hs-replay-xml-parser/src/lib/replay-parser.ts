@@ -4,6 +4,10 @@ import { Element, ElementTree, parse } from 'elementtree';
 import { heroPickExtractor } from './exrtactors/battlegrounds/hero-pick-extractor';
 import { Replay } from './model/replay';
 
+const INNKEEPER_NAMES = ["The Innkeeper", "Aubergiste", "Gastwirt",
+"El tabernero", "Locandiere", "酒場のオヤジ", "여관주인",  "Karczmarz", "O Estalajadeiro", "Хозяин таверны",
+"เจ้าของโรงแรม", "旅店老板", "旅店老闆"];
+
 export const buildReplayFromXml = (replayString: string, allCards: AllCardsService = null): Replay => {
 	if (!replayString || replayString.length === 0) {
 		console.log('no replay string');
@@ -28,9 +32,19 @@ export const buildReplayFromXml = (replayString: string, allCards: AllCardsServi
 		.toJSNumber();
 	// console.log('mainPlayer');
 
-	const opponentPlayerElement = [...elementTree.findall(`.//Player[@isMainPlayer="false"]`)].pop();
+	const opponentCandidates = elementTree.findall(`.//Player[@isMainPlayer="false"]`);
+	// This doesn't work, because sometimes the player name is not attached to the entity with the account info
+	const humanPlayerOpponentCandidates = opponentCandidates
+		.filter(opponent => opponent.get('name') !== 'UNKNOWN HUMAN PLAYER')
+		.filter(opponent => !INNKEEPER_NAMES.includes(opponent.get('name')));
+	const opponentPlayerElement = opponentCandidates.length === 1 
+		? opponentCandidates[0] 
+		: humanPlayerOpponentCandidates.length > 0 
+		? humanPlayerOpponentCandidates[0] 
+		: [...opponentCandidates].pop();	
 	const opponentPlayerId = parseInt(opponentPlayerElement.get('playerID'));
 	const opponentPlayerName = opponentPlayerElement.get('name');
+	console.log('opponentPlayerName', opponentPlayerName);
 	const opponentPlayerEntityId = opponentPlayerElement.get('id');
 	const opponentPlayerCardId = extractPlayerCardId(
 		opponentPlayerElement,
