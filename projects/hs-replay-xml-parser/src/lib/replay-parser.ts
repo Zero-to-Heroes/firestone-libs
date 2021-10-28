@@ -167,13 +167,21 @@ const extractPlayerCardId = (
 
 const extractResult = (mainPlayerEntityId: string, elementTree: ElementTree): string => {
 	const winChanges = elementTree.findall(`.//TagChange[@tag='${GameTag.PLAYSTATE}'][@value='${PlayState.WON}']`);
-	if (!winChanges?.length) {
-		const tieChange = elementTree.find(`.//TagChange[@tag='${GameTag.PLAYSTATE}'][@value='${PlayState.TIED}']`);
-		return tieChange ? 'tied' : 'unknown';
+	console.log(winChanges);
+	if (!!winChanges?.length) {
+		// Because mercenaries introduce another player that mimics the main player, but with another 
+		// entity ID, we need to look at all the tags
+		return winChanges.some(winChange =>  mainPlayerEntityId === winChange.get('entity')) ? 'won' : 'lost';
 	}
-	// Because mercenaries introduce another player that mimics the main player, but with another 
-	// entity ID, we need to look at all the tags
-	return winChanges.some(winChange =>  mainPlayerEntityId === winChange.get('entity')) ? 'won' : 'lost';
+	
+	// For some reason when conceding (early?) in mercs, the WON state never shows up
+	const winningChanges = elementTree.findall(`.//TagChange[@tag='${GameTag.PLAYSTATE}'][@value='${PlayState.WINNING}']`);
+	if (!!winningChanges?.length) {
+		return winningChanges.some(winChange =>  mainPlayerEntityId === winChange.get('entity')) ? 'won' : 'lost';
+	}
+	
+	const tieChange = elementTree.find(`.//TagChange[@tag='${GameTag.PLAYSTATE}'][@value='${PlayState.TIED}']`);
+	return tieChange ? 'tied' : 'unknown';
 };
 
 const extarctPlayCoin = (mainPlayerEntityId: string, elementTree: ElementTree): string => {
