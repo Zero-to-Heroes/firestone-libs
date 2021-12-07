@@ -95,7 +95,7 @@ export const reparseReplay = (
 		...new Set(playerEntities.map(entity => normalizeHeroCardId(entity.get('cardID')))),
 	] as readonly string[];
 	for (const playerCardId of playerCardIds) {
-		structure.playerHps[playerCardId] = playerCardId === 'TB_BaconShop_HERO_34' ? 50 : 40;
+		structure.playerHps[playerCardId] = playerCardId === 'TB_BaconShop_HERO_34' ? 55 : 40;
 	}
 	// console.log('mainPlayerId', replay.mainPlayerId);
 
