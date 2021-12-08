@@ -25,6 +25,7 @@ export const buildReplayFromXml = (replayString: string, allCards: AllCardsServi
 	const mainPlayerId = parseInt(mainPlayerElement.get('playerID'));
 	const mainPlayerName = mainPlayerElement.get('name');
 	const mainPlayerEntityId = mainPlayerElement.get('id');
+	// console.debug('main player', mainPlayerId, mainPlayerName, mainPlayerEntityId);
 	const mainPlayerCardId = extractPlayerCardId(mainPlayerElement, mainPlayerEntityId, elementTree, allCards);
 	const region: BnetRegion = bigInt(parseInt(mainPlayerElement.get('accountHi')))
 		.shiftRight(32)
@@ -53,7 +54,7 @@ export const buildReplayFromXml = (replayString: string, allCards: AllCardsServi
 		? humanPlayerOpponentCandidates[0] 
 		: [...opponentCandidates].pop();	
 	const opponentPlayerName = opponentPlayerElementForName.get('name');
-	console.log('opponentPlayerName', opponentPlayerName);
+	// console.log('opponentPlayerName', opponentPlayerName);
 	// console.log('opponentPlayer');
 
 	const gameFormat = parseInt(elementTree.find('Game').get('formatType'));
@@ -113,63 +114,27 @@ const extractPlayerCardId = (
 	}
 
 	if (allCards) {
-		const heroCreatorDbfId =heroEntity.find(`.Tag[@tag='${GameTag.CREATOR_DBID}']`);
-		if (heroCreatorDbfId && +heroCreatorDbfId.get('value') === allCards.getCard(CardIds.MaestraOfTheMasquerade).dbfId) {
-			const heroControllerId = heroEntity.find(`.Tag[@tag='${GameTag.CONTROLLER}']`).get('value');
-			const heroRevealed = elementTree
-				.findall(`.//FullEntity`)
-				// Hero revealed
-				.filter(entity => entity.get(`cardID`)?.startsWith('HERO_03'))
-				.filter(entity => entity.find(`.Tag[@tag='${GameTag.CARDTYPE}'][@value='${CardType.HERO}']`))
-				.filter(entity => entity.find(`.Tag[@tag='${GameTag.CONTROLLER}'][@value='${heroControllerId}']`));
-			// console.log('heroRevealed', heroRevealed);
-			if (heroRevealed.length > 0) {
-				cardId = heroRevealed[heroRevealed.length - 1].get('cardID');
-			} else {
-				cardId = CardIds.ValeeraSanguinarHeroSkins;
-			}
+		// Handle Maestra
+		const disguiseDbfId = allCards.getCard(CardIds.MaestraOfTheMasquerade_DisguiseEnchantment).dbfId;
+		const heroControllerId = heroEntity.find(`.Tag[@tag='${GameTag.CONTROLLER}']`).get('value');
+		const heroRevealed = elementTree
+			.findall(`.//FullEntity`)
+			.filter(entity => entity.find(`.Tag[@tag='${GameTag.CARDTYPE}'][@value='${CardType.HERO}']`))
+			.filter(entity => entity.find(`.Tag[@tag='${GameTag.CONTROLLER}'][@value='${heroControllerId}']`))
+			.filter(entity => entity.find(`.Tag[@tag='${GameTag.CREATOR_DBID}'][@value='${disguiseDbfId}']`));
+		if (heroRevealed.length > 0) {
+			cardId = heroRevealed[heroRevealed.length - 1].get('cardID');
 		}
-	}	
-
-	// if (allCards) {
-	// 	// That process is a bit heavy, but since it's only for the player class, this should be ok
-	// 	const heroControllerId = heroEntity.find(`.Tag[@tag='${GameTag.CONTROLLER}']`).get('value');
-	// 	const firstNonCreatedNonNeutralRevealedEntity = elementTree
-	// 		.findall(`.//ShowEntity`)
-	// 		.filter(entity => !entity.find(`.Tag[@tag='${GameTag.CREATOR}']`))
-	// 		.filter(entity => !entity.find(`.Tag[@tag='${GameTag.CREATOR_DBID}']`))
-	// 		.filter(entity => !entity.find(`.Tag[@tag='${GameTag.DISPLAYED_CREATOR}']`))
-	// 		.filter(entity => entity.find(`.Tag[@tag='${GameTag.CONTROLLER}'][@value='${heroControllerId}']`))
-	// 		.map(entity => entity.get('cardID'))
-	// 		.filter(cardId => !!cardId)
-	// 		.map(cardId => allCards.getCard(cardId))
-	// 		.find(card => card.playerClass !== 'Neutral');
-	// 	const heroClass = allCards.getCard(cardId)?.playerClass;
-	// 	if (firstNonCreatedNonNeutralRevealedEntity?.playerClass && heroClass !== firstNonCreatedNonNeutralRevealedEntity?.playerClass) {
-	// 		console.log('first card played class does not match hero class, Maestra?', firstNonCreatedNonNeutralRevealedEntity.playerClass, cardId);
-	// 		if (firstNonCreatedNonNeutralRevealedEntity.playerClass === 'Rogue') {
-	// 			// console.log('heroControllerId', heroControllerId);
-	// 			// For Maestra
-	// 			const heroRevealed = elementTree
-	// 				.findall(`.//FullEntity`)
-	// 				// Hero revealed
-	// 				.filter(entity => entity.get(`cardID`)?.startsWith('HERO_03'))
-	// 				.filter(entity => entity.find(`.Tag[@tag='${GameTag.CARDTYPE}'][@value='${CardType.HERO}']`))
-	// 				.filter(entity => entity.find(`.Tag[@tag='${GameTag.CONTROLLER}'][@value='${heroControllerId}']`));
-	// 			// console.log('heroRevealed', heroRevealed);
-	// 			if (heroRevealed.length > 0) {
-	// 				cardId = heroRevealed[heroRevealed.length - 1].get('cardID');
-	// 			}
-	// 		}
-	// 	}
-	// }	
+		// else {
+		// 	cardId = CardIds.ValeeraSanguinarHeroSkins;
+		// }
+	}
 	
 	return cardId;
 };
 
 const extractResult = (mainPlayerEntityId: string, elementTree: ElementTree): string => {
 	const winChanges = elementTree.findall(`.//TagChange[@tag='${GameTag.PLAYSTATE}'][@value='${PlayState.WON}']`);
-	console.log(winChanges);
 	if (!!winChanges?.length) {
 		// Because mercenaries introduce another player that mimics the main player, but with another 
 		// entity ID, we need to look at all the tags
