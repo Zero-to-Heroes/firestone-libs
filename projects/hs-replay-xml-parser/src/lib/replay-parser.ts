@@ -19,9 +19,29 @@ export const buildReplayFromXml = (replayString: string, allCards: AllCardsServi
 	const elementTree = parse(replayString);
 	// console.log('elementTree');
 
-	const mainPlayerElement =
-		elementTree.findall('.//Player').find(player => player.get('isMainPlayer') === 'true') ||
-		elementTree.findall('.//Player')[0]; // Should never happen, but a fallback just in case
+	let mainPlayerElement =
+		elementTree.findall('.//Player').find(player => player.get('isMainPlayer') === 'true');
+	// Can happen in case of reconnects
+	if (!mainPlayerElement) {
+		// Find out known cards in hand, they must belong to the player
+		const allFullEntitiesOnGameElement = elementTree.find('.Game').findall('.FullEntity');
+		for (const entity of allFullEntitiesOnGameElement) {
+			const cardId = entity.get('cardID');
+			const inHand = entity.find(`.Tag[@tag='${GameTag.ZONE}'][@value='${Zone.HAND}']`);
+			if (inHand && !!cardId) {
+				const controllerId = entity.find(`.Tag[@tag='${GameTag.CONTROLLER}']`).get('value');
+				mainPlayerElement = elementTree.findall('.//Player').find(player => player.get('playerID') === controllerId);
+				break;
+			}
+		}
+	}	
+	// Reconnect happened without any card in hand
+	if (!mainPlayerElement) {
+		// No idea how to handle this
+	}
+	if (!mainPlayerElement) {
+		mainPlayerElement = elementTree.findall('.//Player')[0]; // Should never happen, but a fallback just in case
+	}
 	const mainPlayerId = parseInt(mainPlayerElement.get('playerID'));
 	const mainPlayerName = mainPlayerElement.get('name');
 	const mainPlayerEntityId = mainPlayerElement.get('id');
@@ -33,7 +53,7 @@ export const buildReplayFromXml = (replayString: string, allCards: AllCardsServi
 		.toJSNumber();
 	// console.log('mainPlayer');
 
-	const opponentCandidates = elementTree.findall(`.//Player[@isMainPlayer="false"]`);
+	const opponentCandidates = elementTree.findall(`.//Player[@isMainPlayer="false"]`).filter(entity => parseInt(entity.get('playerID')) !== mainPlayerId);
 	const opponentPlayerElement = [...opponentCandidates].pop();
 	const opponentPlayerId = parseInt(opponentPlayerElement.get('playerID'));
 	const opponentPlayerEntityId = opponentPlayerElement.get('id');
@@ -54,7 +74,7 @@ export const buildReplayFromXml = (replayString: string, allCards: AllCardsServi
 		? humanPlayerOpponentCandidates[0] 
 		: [...opponentCandidates].pop();	
 	const opponentPlayerName = opponentPlayerElementForName.get('name');
-	// console.log('opponentPlayerName', opponentPlayerName);
+	// console.log('opponentPlayerName', opponentPlayerName, mainPlayerElement, humanPlayerOpponentCandidates);
 	// console.log('opponentPlayer');
 
 	const gameFormat = parseInt(elementTree.find('Game').get('formatType'));

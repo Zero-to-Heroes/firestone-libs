@@ -1,6 +1,6 @@
 import { AllCardsService } from '@firestone-hs/reference-data';
 import { parseHsReplayString } from '../xml-parser';
-import { xml } from './maestra.xml';
+import { xml } from './reconnect.xml';
 
 const test = async () => {
 	const allCards = new AllCardsService();
