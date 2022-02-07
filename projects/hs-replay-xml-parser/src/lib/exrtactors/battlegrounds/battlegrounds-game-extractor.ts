@@ -23,7 +23,7 @@ export const buildPostMatchStats = (
 		tripleTimings: player?.tripleHistory ?? [], // TODO: add the cards when relevant
 		coinsWastedOverTurn: structure.coinsWastedOverTurn,
 		rerolls: structure.rerollsOverTurn.map(turnInfo => turnInfo.value).reduce((a, b) => a + b, 0),
-		boardHistory: player?.boardHistory ?? [],
+		boardHistory: player?.boardHistory ?? structure.boardHistory ?? [],
 		rerollsOverTurn: structure.rerollsOverTurn,
 		freezesOverTurn: structure.freezesOverTurn,
 		mainPlayerHeroPowersOverTurn: structure.mainPlayerHeroPowersOverTurn,

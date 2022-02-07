@@ -2,6 +2,7 @@
 import { BlockType, CardType, GameTag, MetaTags, PlayState, Step, Zone } from '@firestone-hs/reference-data';
 import { Element } from 'elementtree';
 import { Map } from 'immutable';
+import { BgsBoard, Entity } from 'src/public-api';
 import { extractHeroEntityIds } from '../../global-info-extractor';
 import { BooleanTurnInfo } from '../../model/boolean-turn-info';
 import { ComplexTurnInfo } from '../../model/complex-turn-info';
@@ -16,6 +17,7 @@ import { normalizeHeroCardId } from './utils';
 export const reparseReplay = (
 	replay: Replay,
 ): {
+	boardHistory: readonly BgsBoard[];
 	rerollsOverTurn: readonly NumericTurnInfo[];
 	freezesOverTurn: readonly NumericTurnInfo[];
 	coinsWastedOverTurn: readonly NumericTurnInfo[];
@@ -30,6 +32,7 @@ export const reparseReplay = (
 	totalMinionsDamageTaken: { [cardId: string]: number };
 	totalEnemyMinionsKilled: number;
 	totalEnemyHeroesKilled: number;
+
 } => {
 	if (!replay) {
 		return {} as any;
@@ -42,6 +45,7 @@ export const reparseReplay = (
 	const structure: ParsingStructure = {
 		currentTurn: 0,
 		boardOverTurn: Map.of(),
+		boardOverTurnDetailed: Map.of(),
 		rerollOverTurn: Map.of(),
 		freezeOverTurn: Map.of(),
 		wentFirstInBattleOverTurn: Map.of(),
@@ -122,6 +126,7 @@ export const reparseReplay = (
 			wentFirstInBattleForTurnParse(structure, replay.mainPlayerId),
 		],
 		[
+			boardForTurnPopulate(structure, replay),
 			compositionForTurnPopulate(structure, replay),
 			rerollsForTurnPopulate(structure, replay),
 			freezesForTurnPopulate(structure, replay),
@@ -139,6 +144,12 @@ export const reparseReplay = (
 		],
 	);
 
+	const boardHistory = structure.boardOverTurnDetailed.map(
+		(board, turn) => ({
+			turn: turn,
+			board: board,
+		} as BgsBoard)
+	).toArray();
 	const rerollsOverTurn: readonly NumericTurnInfo[] = structure.rerollOverTurn
 		.map(
 			(rerolls, turn: number) =>
@@ -236,6 +247,7 @@ export const reparseReplay = (
 
 	return {
 		// compositionsOverTurn: compositionsOverTurn,
+		boardHistory: boardHistory,
 		rerollsOverTurn: rerollsOverTurn,
 		freezesOverTurn: freezesOverTurn,
 		mainPlayerHeroPowersOverTurn: mainPlayerHeroPowersOverTurn,
@@ -661,9 +673,10 @@ const damageDealtToEnemyHeroPopulate = (structure: ParsingStructure, replay: Rep
 
 // While we don't use the metric, the entity info that is populated is useful for other extractors
 const compositionForTurnParse = (structure: ParsingStructure) => {
-	return element => {
+	return (element: Element) => {
 		if (element.tag === 'FullEntity') {
 			structure.entities[element.get('id')] = {
+				entityId: parseInt(element.get('id')),
 				cardId: normalizeHeroCardId(element.get('cardID')),
 				controller: parseInt(element.find(`.Tag[@tag='${GameTag.CONTROLLER}']`)?.get('value') || '-1'),
 				zone: parseInt(element.find(`.Tag[@tag='${GameTag.ZONE}']`)?.get('value') || '-1'),
@@ -672,28 +685,56 @@ const compositionForTurnParse = (structure: ParsingStructure) => {
 				tribe: parseInt(element.find(`.Tag[@tag='${GameTag.CARDRACE}']`)?.get('value') || '-1'),
 				atk: parseInt(element.find(`.Tag[@tag='${GameTag.ATK}']`)?.get('value') || '0'),
 				health: parseInt(element.find(`.Tag[@tag='${GameTag.HEALTH}']`)?.get('value') || '0'),
+				premium: parseInt(element.find(`.Tag[@tag='${GameTag.PREMIUM}']`)?.get('value') || '0'),
+				taunt: parseInt(element.find(`.Tag[@tag='${GameTag.TAUNT}']`)?.get('value') || '0'),
+				windfury: parseInt(element.find(`.Tag[@tag='${GameTag.WINDFURY}']`)?.get('value') || '0'),
+				megaWindfury: parseInt(element.find(`.Tag[@tag='${GameTag.MEGA_WINDFURY}']`)?.get('value') || '0'),
+				divineShield: parseInt(element.find(`.Tag[@tag='${GameTag.DIVINE_SHIELD}']`)?.get('value') || '0'),
+				poisonous: parseInt(element.find(`.Tag[@tag='${GameTag.POISONOUS}']`)?.get('value') || '0'),
+				reborn: parseInt(element.find(`.Tag[@tag='${GameTag.REBORN}']`)?.get('value') || '0'),
+				tags: Map(element.findall('.Tag').map(tag => [GameTag[parseInt(tag.get('tag'))], parseInt(tag.get('value'))])),
 			};
 		}
-		if (structure.entities[element.get('entity')]) {
+		if (structure.entities[element.get('entity')] && !!element.get('tag')) {
 			if (parseInt(element.get('tag')) === GameTag.CONTROLLER) {
 				structure.entities[element.get('entity')].controller = parseInt(element.get('value'));
 			}
 			if (parseInt(element.get('tag')) === GameTag.ZONE) {
-				// console.log('entity', child.get('entity'), structure.entities[child.get('entity')]);
 				structure.entities[element.get('entity')].zone = parseInt(element.get('value'));
 			}
 			if (parseInt(element.get('tag')) === GameTag.ZONE_POSITION) {
-				// console.log('entity', child.get('entity'), structure.entities[child.get('entity')]);
 				structure.entities[element.get('entity')].zonePosition = parseInt(element.get('value'));
 			}
 			if (parseInt(element.get('tag')) === GameTag.ATK) {
-				// ATK.log('entity', child.get('entity'), structure.entities[child.get('entity')]);
 				structure.entities[element.get('entity')].atk = parseInt(element.get('value'));
 			}
 			if (parseInt(element.get('tag')) === GameTag.HEALTH) {
-				// console.log('entity', child.get('entity'), structure.entities[child.get('entity')]);
 				structure.entities[element.get('entity')].health = parseInt(element.get('value'));
 			}
+			if (parseInt(element.get('tag')) === GameTag.PREMIUM) {
+				structure.entities[element.get('entity')].premium = parseInt(element.get('value'));
+			}
+			if (parseInt(element.get('tag')) === GameTag.TAUNT) {
+				structure.entities[element.get('entity')].taunt = parseInt(element.get('value'));
+			}
+			if (parseInt(element.get('tag')) === GameTag.WINDFURY) {
+				structure.entities[element.get('entity')].windfury = parseInt(element.get('value'));
+			}
+			if (parseInt(element.get('tag')) === GameTag.MEGA_WINDFURY) {
+				structure.entities[element.get('entity')].megaWindfury = parseInt(element.get('value'));
+			}
+			if (parseInt(element.get('tag')) === GameTag.DIVINE_SHIELD) {
+				structure.entities[element.get('entity')].divineShield = parseInt(element.get('value'));
+			}
+			if (parseInt(element.get('tag')) === GameTag.POISONOUS) {
+				structure.entities[element.get('entity')].poisonous = parseInt(element.get('value'));
+			}
+			if (parseInt(element.get('tag')) === GameTag.REBORN) {
+				structure.entities[element.get('entity')].reborn = parseInt(element.get('value'));
+			}
+			structure.entities[element.get('entity')].tags = structure.entities[element.get('entity')].tags.set(
+				GameTag[parseInt(element.get('tag'))], parseInt(element.get('value'))
+			)
 		}
 	};
 };
@@ -701,7 +742,7 @@ const compositionForTurnParse = (structure: ParsingStructure) => {
 const compositionForTurnPopulate = (structure: ParsingStructure, replay: Replay) => {
 	return currentTurn => {
 		const playerEntitiesOnBoard = Object.values(structure.entities)
-			.map(entity => entity as any)
+			.map(entity => entity)
 			.filter(entity => entity.controller === replay.mainPlayerId)
 			.filter(entity => entity.zone === Zone.PLAY)
 			.filter(entity => entity.cardType === CardType.MINION)
@@ -710,6 +751,22 @@ const compositionForTurnPopulate = (structure: ParsingStructure, replay: Replay)
 				tribe: entity.tribe,
 			}));
 		structure.boardOverTurn = structure.boardOverTurn.set(currentTurn, playerEntitiesOnBoard);
+		// console.log('updated', structure.boardOverTurn.toJS(), playerEntitiesOnBoard);
+	};
+};
+
+const boardForTurnPopulate = (structure: ParsingStructure, replay: Replay) => {
+	return currentTurn => {
+		const playerEntitiesOnBoard = Object.values(structure.entities)
+			.filter(entity => entity.controller === replay.mainPlayerId)
+			.filter(entity => entity.zone === Zone.PLAY)
+			.filter(entity => entity.cardType === CardType.MINION)
+			.map(entity => ({
+				cardID: entity.cardId,
+				id: entity.entityId,
+				tags: entity.tags,
+			} as Entity));
+		structure.boardOverTurnDetailed = structure.boardOverTurnDetailed.set(currentTurn, playerEntitiesOnBoard);
 		// console.log('updated', structure.boardOverTurn.toJS(), playerEntitiesOnBoard);
 	};
 };

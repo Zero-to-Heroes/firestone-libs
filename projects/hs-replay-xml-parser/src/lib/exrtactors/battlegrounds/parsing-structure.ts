@@ -1,4 +1,5 @@
 import { Map } from 'immutable';
+import { Entity } from 'src/public-api';
 import { NumericTurnInfo } from '../../model/numeric-turn-info';
 import { ValueHeroInfo } from '../../model/value-hero-info';
 
@@ -7,6 +8,7 @@ export interface ParsingStructure {
 
 	entities: {
 		[entityId: string]: {
+			entityId: number;
 			cardId: string;
 			tribe: number;
 			controller: number;
@@ -15,6 +17,14 @@ export interface ParsingStructure {
 			cardType: number;
 			atk: number;
 			health: number;
+			premium: number;
+			taunt: number;
+			windfury: number;
+			megaWindfury: number;
+			divineShield: number;
+			poisonous: number;
+			reborn: number;
+			tags: Map<string, number>;
 		};
 	};
 	playerHps: {
@@ -40,6 +50,7 @@ export interface ParsingStructure {
 	wentFirstInBattleThisTurn: boolean;
 
 	boardOverTurn: Map<number, readonly { cardId: string; tribe: number }[]>;
+	boardOverTurnDetailed: Map<number, readonly Entity[]>;
 	minionsDamageDealt: { [cardId: string]: number };
 	minionsDamageReceived: { [cardId: string]: number };
 	rerollOverTurn: Map<number, number>;
