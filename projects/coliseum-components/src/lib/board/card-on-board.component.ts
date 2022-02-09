@@ -1,4 +1,3 @@
-import { animate, style, transition, trigger } from '@angular/animations';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CardClass, CardType, GameTag } from '@firestone-hs/reference-data';
 import { AllCardsService, Entity } from '@firestone-hs/replay-parser';
@@ -38,13 +37,13 @@ import { AllCardsService, Entity } from '@firestone-hs/replay-parser';
 		</div>
 	`,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	animations: [
-		trigger('fadeInOut', [
-			transition(':enter', [style({ width: 0 }), animate(150, style({ width: '100%' }))]),
-			transition(':leave', [style({ width: '100%' }), animate(150, style({ width: 0 }))]),
-		]),
-	],
-	host: { '[@fadeInOut]': 'in' },
+	// animations: [
+	// 	trigger('fadeInOut', [
+	// 		transition(':enter', [style({ width: 0 }), animate(150, style({ width: '100%' }))]),
+	// 		transition(':leave', [style({ width: '100%' }), animate(150, style({ width: 0 }))]),
+	// 	]),
+	// ],
+	// host: { '[@fadeInOut]': 'in' },
 })
 export class CardOnBoardComponent {
 	_entity: Entity;
