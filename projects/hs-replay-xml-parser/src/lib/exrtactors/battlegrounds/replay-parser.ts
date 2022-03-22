@@ -104,13 +104,16 @@ export const reparseReplay = (
 	// console.log('mainPlayerId', replay.mainPlayerId);
 
 	const opponentHeroEntityIds = extractHeroEntityIds(replay, replay.opponentPlayerId);
+	
+	const startingTurnStr = replay.replay.find('.//GameEntity').find(`.//Tag[@tag='${GameTag.TURN}']`)?.get('value');
+	const startingTurn = startingTurnStr ? parseInt(startingTurnStr) : 0;
 
 	parseElement(
 		replay.replay.getroot(),
 		replay.mainPlayerId,
 		opponentPlayerEntityId,
 		null,
-		{ currentTurn: 0 },
+		{ currentTurn: startingTurn },
 		[
 			compositionForTurnParse(structure),
 			rerollsForTurnParse(structure),
