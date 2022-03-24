@@ -1,6 +1,6 @@
 import { AllCardsService } from '@firestone-hs/reference-data';
 import { parseBattlegroundsGame } from '../xml-parser';
-import { xml } from './bg-game.xml';
+import { xml } from './bg-reconnect.xml';
 
 const test = async () => {
 	const allCards = new AllCardsService();
