@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 @Component({
 	selector: 'damage',
@@ -17,8 +17,6 @@ export class DamageComponent {
 	image: string;
 	prefix: string;
 	_amount: number;
-
-	constructor(private elRef: ElementRef, private cdr: ChangeDetectorRef) {}
 
 	@Input('amount') set amount(value: number) {
 		// console.log('[damage] setting amount', value);

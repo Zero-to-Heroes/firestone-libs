@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, ViewRef } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
 
 @Component({
 	selector: 'tavern-level-icon',
@@ -18,12 +18,12 @@ export class TavernLevelIconComponent {
 		? `https://static.zerotoheroes.com/hearthstone/asset/coliseum/images/battlegrounds/tavern_banner_${value}.png` 
 		: 'https://static.zerotoheroes.com/hearthstone/asset/coliseum/images/battlegrounds/tavern_banner_0.png';
 		
-		if (!(this.cdr as ViewRef)?.destroyed) {
-			this.cdr.detectChanges();
-		}
+		// if (!(this.cdr as ViewRef)?.destroyed) {
+		// 	this.cdr.detectChanges();
+		// }
 	}
 
 	constructor(private readonly cdr: ChangeDetectorRef) {
-		cdr.detach();
+		// cdr.detach();
 	}
 }

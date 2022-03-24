@@ -15,8 +15,6 @@ import { Entity } from '@firestone-hs/replay-parser';
 export class CardOnBoardOverlaysComponent {
 	overlays: string[][];
 
-	constructor() {}
-
 	@Input('entity') set entity(value: Entity) {
 		// console.log('[card-on-board-overlays] setting entity', value);
 		this.overlays = [];

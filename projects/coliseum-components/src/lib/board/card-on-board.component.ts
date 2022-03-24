@@ -22,7 +22,6 @@ import { AllCardsService, Entity } from '@firestone-hs/replay-parser';
 					[attack]="attack"
 					[health]="health"
 					[damage]="damage"
-					[useSvg]="useSvg"
 				>
 				</board-card-stats>
 			</div>
@@ -73,7 +72,6 @@ export class CardOnBoardComponent {
 
 	@Input() isMainPlayer: boolean;
 	@Input() isRecruitPhase: boolean;
-	@Input() useSvg: boolean = true;
 
 	@Input('entity') set entity(entity: Entity) {
 		// console.log('[card-on-board] setting entity', entity.id, entity, entity.tags.toJS());

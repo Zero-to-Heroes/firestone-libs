@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, ViewRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { AllCardsService } from '@firestone-hs/replay-parser';
 
 @Component({
@@ -8,18 +8,12 @@ import { AllCardsService } from '@firestone-hs/replay-parser';
 		<div class="card-stats" *ngIf="hasStats">
 			<div class="stat {{ attackClass }}">
 				<div class="stat-value">
-					<svg viewBox="0 0 20 20" *ngIf="useSvg">
-						<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle">{{ _attack }}</text>
-					</svg>
-					<span class="value" *ngIf="!useSvg">{{ _attack }}</span>
+					<span class="value">{{ _attack }}</span>
 				</div>
 			</div>
 			<div class="stat {{ healthClass }}">
 				<div class="stat-value">
-					<svg viewBox="0 0 20 20" *ngIf="useSvg">
-						<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle">{{ healthLeft }}</text>
-					</svg>
-					<span class="value" *ngIf="!useSvg">{{ healthLeft }}</span>
+					<span class="value">{{ healthLeft }}</span>
 				</div>
 			</div>
 		</div>
@@ -27,8 +21,6 @@ import { AllCardsService } from '@firestone-hs/replay-parser';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BoardCardStatsComponent {
-	@Input() useSvg: boolean;
-
 	@Input('cardId') set cardId(cardId: string) {
 		// console.log('[board-card-stats] setting cardId', cardId);
 		this._cardId = cardId;
@@ -67,8 +59,6 @@ export class BoardCardStatsComponent {
 
 	constructor(
 		private cards: AllCardsService,
-		private cdr: ChangeDetectorRef,
-		private elRef: ElementRef,
 		
 	) {}
 
@@ -97,9 +87,9 @@ export class BoardCardStatsComponent {
 		this.healthLeft = this._health - this._damage;
 		this.updateAttackClass(originalCard);
 		this.updateHealthClass(originalCard);
-		if (!(this.cdr as ViewRef)?.destroyed) {
-			this.cdr.detectChanges();
-		}
+		// if (!(this.cdr as ViewRef)?.destroyed) {
+		// 	this.cdr.detectChanges();
+		// }
 	}
 
 	private updateAttackClass(originalCard) {
@@ -118,20 +108,6 @@ export class BoardCardStatsComponent {
 		}
 		if (this._damage > 0) {
 			this.healthClass += ' damaged';
-		}
-	}
-
-	private resizeText() {
-		const el = this.elRef.nativeElement.querySelector('.card-stats');
-		if (!el) {
-			setTimeout(() => this.resizeText());
-			return;
-		}
-		const fontSize = 0.2 * el.getBoundingClientRect().width;
-		const textEl = this.elRef.nativeElement.querySelector('.card-stats');
-		textEl.style.fontSize = fontSize + 'px';
-		if (!(this.cdr as ViewRef)?.destroyed) {
-			this.cdr.detectChanges();
 		}
 	}
 }
