@@ -184,15 +184,17 @@ const extractBgsAdditionalResult = (
 	opponentPlayerId: number,
 	elementTree: ElementTree,
 ): number => {
+	console.log('mainPlayerId', mainPlayerId);
 	const playerEntities = extractPlayerEntities(mainPlayerId, elementTree, true);
+	console.log('playerEntities', playerEntities);
 	const entityIds = playerEntities.map(entity => entity.get('id'));
-	// console.log('player entity ids', entityIds);
+	console.log('player entity ids', entityIds);
 	let leaderboardTags = elementTree
 		.findall(`.//TagChange[@tag='${GameTag.PLAYER_LEADERBOARD_PLACE}']`)
 		.filter(tag => entityIds.indexOf(tag.get('entity')) !== -1)
 		.map(tag => parseInt(tag.get('value')))
 		.filter(value => value > 0);
-	// console.log('leaderboard tag changes', leaderboardTags);
+	console.log('leaderboard tag changes', leaderboardTags);
 	// No tag change, look at root tag
 	if (!leaderboardTags || leaderboardTags.length === 0) {
 		// console.log('no tag change, looking at root');
@@ -201,7 +203,7 @@ const extractBgsAdditionalResult = (
 			.filter(tag => tag)
 			.map(tag => parseInt(tag.get('value')))
 			.filter(value => value > 0);
-		// console.log('leaderboard tag changes at root', leaderboardTags);
+		console.log('leaderboard tag changes at root', leaderboardTags);
 	}
 	return !leaderboardTags || leaderboardTags.length === 0 ? 0 : leaderboardTags[leaderboardTags.length - 1];
 };
