@@ -1,6 +1,6 @@
 {
 	"name": "@firestone-hs/replay-parser",
-	"version": "1.1.46",
+	"version": "1.1.47",
 	"main": "bundles/firestone-replay-parser.umd.js",
 	"module": "fesm5/firestone-replay-parser.js",
 	"es2015": "fesm2015/firestone-replay-parser.js",
@@ -16,7 +16,7 @@
 		"@angular/core": "^8.2.9",
 		"@angular/platform-browser": "~8.2.9",
 		"@firestone-hs/simulate-bgs-battle": "^1.1.29",
-		"@firestone-hs/reference-data": "0.1.92",
+		"@firestone-hs/reference-data": "1.0.3",
 		"immutable": "3.8.2",
 		"lodash-es": "4.17.15",
 		"node-fetch": "^2.6.0",

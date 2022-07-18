@@ -4,7 +4,7 @@ import { xml } from './bg-game.xml';
 
 const test = async () => {
 	const allCards = new AllCardsService();
-	await allCards.initializeCardsDb('oerijgoeiryjrjgireuhjgiozuerhg');
+	await allCards.initializeCardsDb();
 	// const stats = parseBattlegroundsGame(xml, null, null, null);
 	// console.log('stats', stats);
 	const replay = parseHsReplayString(xml, allCards);
