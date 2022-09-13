@@ -28,7 +28,7 @@
 		"elementtree": "^0.1.7",
 		"ng2-fittext": "^1.2.8",
 		"ngx-logger": "3.3.11",
-		"node-fetch": "^2.6.0",
+		"node-fetch": "^2.6.7",
 		"rxjs": "~6.4.0",
 		"saxes": "^4.0.2",
 		"tslib": "^1.10.0",
