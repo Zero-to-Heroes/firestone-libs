@@ -1,9 +1,8 @@
 module.exports = {
 	parser: '@typescript-eslint/parser',
 	parserOptions: {
-		ecmaVersion: 2018, // Allows for the parsing of modern ECMAScript features
+		ecmaVersion: 2019, // Allows for the parsing of modern ECMAScript features
 		sourceType: 'module',
-		project: './tsconfig.json',
 	},
 	plugins: ['@typescript-eslint/eslint-plugin'],
 	extends: [

@@ -20,7 +20,7 @@ import { PlayerOpponentValues } from './model/player-opponent-values';
 import { Replay } from './model/replay';
 import { buildReplayFromXml } from './replay-parser';
 
-export const parseHsReplayString = (replayString: string, allCards: AllCardsService = null): Replay => {
+export const parseHsReplayString = (replayString: string, allCards: AllCardsService): Replay => {
 	return buildReplayFromXml(replayString, allCards);
 };
 
@@ -61,8 +61,9 @@ export const parseBattlegroundsGame = (
 	mainPlayer: BgsPlayer,
 	battleResultHistory: readonly BattleResultHistory[],
 	faceOffs: readonly BgsFaceOff[],
+	allCards: AllCardsService,
 ): BgsPostMatchStats => {
-	return buildPostMatchStats(replayXml, mainPlayer, battleResultHistory, faceOffs);
+	return buildPostMatchStats(replayXml, mainPlayer, battleResultHistory, faceOffs, allCards);
 };
 
 export const buildLuckFactor = (battleResultHistory: readonly BattleResultHistory[]): number => {

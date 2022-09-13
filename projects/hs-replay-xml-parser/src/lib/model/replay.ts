@@ -18,4 +18,14 @@ export class Replay {
 	readonly result: 'won' | 'lost' | 'tied';
 	readonly additionalResult: string;
 	readonly playCoin: 'play' | 'coin';
+	readonly hasBgsQuests: boolean;
+	readonly bgsHeroQuests: readonly BgsHeroQuest[];
+}
+
+export interface BgsHeroQuest {
+	readonly questCardId: string;
+	readonly questDifficulty: number;
+	readonly rewardCardId: string;
+	readonly isCompleted: boolean;
+	readonly turnCompleted: number;
 }

@@ -2,13 +2,14 @@ import { AllCardsService, BnetRegion, CardIds, CardType, GameTag, GameType, Play
 import bigInt from 'big-integer';
 import { Element, ElementTree, parse } from 'elementtree';
 import { heroPickExtractor } from './exrtactors/battlegrounds/hero-pick-extractor';
+import { extractHasBgsQuests, extractHeroQuests } from './exrtactors/battlegrounds/quests-extractor';
 import { Replay } from './model/replay';
 
 const INNKEEPER_NAMES = ["The Innkeeper", "Aubergiste", "Gastwirt",
 "El tabernero", "Locandiere", "酒場のオヤジ", "여관주인",  "Karczmarz", "O Estalajadeiro", "Хозяин таверны",
 "เจ้าของโรงแรม", "旅店老板", "旅店老闆"];
 
-export const buildReplayFromXml = (replayString: string, allCards: AllCardsService = null): Replay => {
+export const buildReplayFromXml = (replayString: string, allCards: AllCardsService): Replay => {
 	if (!replayString || replayString.length === 0) {
 		console.log('no replay string');
 		return null;
@@ -83,12 +84,17 @@ export const buildReplayFromXml = (replayString: string, allCards: AllCardsServi
 
 	const result = extractResult(mainPlayerEntityId, elementTree);
 	// console.log('result');
+	const isBgGame = gameMode === GameType.GT_BATTLEGROUNDS || gameMode === GameType.GT_BATTLEGROUNDS_FRIENDLY;
 	const additionalResult =
-		gameMode === GameType.GT_BATTLEGROUNDS || gameMode === GameType.GT_BATTLEGROUNDS_FRIENDLY
+		isBgGame		
 			? '' + extractBgsAdditionalResult(mainPlayerId, mainPlayerCardId, opponentPlayerId, elementTree)
 			: null;
 	// console.log('bgsResult');
 	const playCoin = extarctPlayCoin(mainPlayerEntityId, elementTree);
+
+	// BG-specific stuff
+	const hasBgsQuests = isBgGame ? extractHasBgsQuests(elementTree) : null;
+	const bgsHeroQuests = isBgGame && hasBgsQuests ? extractHeroQuests(elementTree, mainPlayerId, allCards) : null;
 
 	return Object.assign(new Replay(), {
 		replay: elementTree,
@@ -107,6 +113,8 @@ export const buildReplayFromXml = (replayString: string, allCards: AllCardsServi
 		result: result,
 		additionalResult: additionalResult,
 		playCoin: playCoin,
+		hasBgsQuests: hasBgsQuests,
+		bgsHeroQuests: bgsHeroQuests,
 	} as Replay);
 };
 
@@ -186,7 +194,7 @@ const extractBgsAdditionalResult = (
 ): number => {
 	console.log('mainPlayerId', mainPlayerId);
 	const playerEntities = extractPlayerEntities(mainPlayerId, elementTree, true);
-	console.log('playerEntities', playerEntities);
+	// console.log('playerEntities', playerEntities);
 	const entityIds = playerEntities.map(entity => entity.get('id'));
 	console.log('player entity ids', entityIds);
 	let leaderboardTags = elementTree
@@ -194,7 +202,7 @@ const extractBgsAdditionalResult = (
 		.filter(tag => entityIds.indexOf(tag.get('entity')) !== -1)
 		.map(tag => parseInt(tag.get('value')))
 		.filter(value => value > 0);
-	console.log('leaderboard tag changes', leaderboardTags);
+	// console.log('leaderboard tag changes', leaderboardTags);
 	// No tag change, look at root tag
 	if (!leaderboardTags || leaderboardTags.length === 0) {
 		// console.log('no tag change, looking at root');

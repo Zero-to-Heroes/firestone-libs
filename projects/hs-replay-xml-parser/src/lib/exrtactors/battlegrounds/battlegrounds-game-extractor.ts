@@ -1,4 +1,4 @@
-import { GameTag } from '@firestone-hs/reference-data';
+import { AllCardsService, GameTag } from '@firestone-hs/reference-data';
 import { BattleResultHistory, BgsBoard, BgsComposition, BgsPlayer, Entity } from '../../model/battlegrounds';
 import { BgsFaceOff } from '../../model/bgs-face-off';
 import { BgsPostMatchStats } from '../../model/bgs-post-match-stats';
@@ -11,9 +11,10 @@ export const buildPostMatchStats = (
 	replayXml: string,
 	mainPlayer: BgsPlayer,
 	battleResultHistory: readonly BattleResultHistory[],
-	faceOffs: readonly BgsFaceOff[],
+	faceOffs: readonly BgsFaceOff[], 
+	allCards: AllCardsService,
 ): BgsPostMatchStats => {
-	const replay: Replay = parseHsReplayString(replayXml);
+	const replay: Replay = parseHsReplayString(replayXml, allCards);
 	// console.log('parsed replay', replayXml?.length);
 	const player: BgsPlayer = mainPlayer;
 	const structure = reparseReplay(replay);
