@@ -61,7 +61,7 @@
 		"karma-jasmine": "~2.0.1",
 		"karma-jasmine-html-reporter": "^1.5.1",
 		"lodash-es": "^4.17.15",
-		"ng-packagr": "^5.7.1",
+		"ng-packagr": "^14.2.1",
 		"ngx-logger": "3.3.11",
 		"prettier": "1.18.2",
 		"protractor": "~5.4.0",
