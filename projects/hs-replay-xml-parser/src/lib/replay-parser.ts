@@ -174,6 +174,16 @@ const extractResult = (mainPlayerEntityId: string, elementTree: ElementTree): st
 	if (!!winningChanges?.length) {
 		return winningChanges.some(winChange =>  mainPlayerEntityId === winChange.get('entity')) ? 'won' : 'lost';
 	}
+
+	// Same comment with LOSE / LOSING
+	const loseChanges = elementTree.findall(`.//TagChange[@tag='${GameTag.PLAYSTATE}'][@value='${PlayState.LOST}']`);
+	if (!!loseChanges?.length) {
+		return loseChanges.some(winChange =>  mainPlayerEntityId === winChange.get('entity')) ? 'lost' : 'won';
+	}
+	const losingChanges = elementTree.findall(`.//TagChange[@tag='${GameTag.PLAYSTATE}'][@value='${PlayState.LOSING}']`);
+	if (!!losingChanges?.length) {
+		return losingChanges.some(winChange =>  mainPlayerEntityId === winChange.get('entity')) ? 'lost' : 'won';
+	}
 	
 	const tieChange = elementTree.find(`.//TagChange[@tag='${GameTag.PLAYSTATE}'][@value='${PlayState.TIED}']`);
 	return tieChange ? 'tied' : 'unknown';
@@ -192,11 +202,11 @@ const extractBgsAdditionalResult = (
 	opponentPlayerId: number,
 	elementTree: ElementTree,
 ): number => {
-	console.log('mainPlayerId', mainPlayerId);
+	// console.log('mainPlayerId', mainPlayerId);
 	const playerEntities = extractPlayerEntities(mainPlayerId, elementTree, true);
 	// console.log('playerEntities', playerEntities);
 	const entityIds = playerEntities.map(entity => entity.get('id'));
-	console.log('player entity ids', entityIds);
+	// console.log('player entity ids', entityIds);
 	let leaderboardTags = elementTree
 		.findall(`.//TagChange[@tag='${GameTag.PLAYER_LEADERBOARD_PLACE}']`)
 		.filter(tag => entityIds.indexOf(tag.get('entity')) !== -1)
@@ -211,7 +221,7 @@ const extractBgsAdditionalResult = (
 			.filter(tag => tag)
 			.map(tag => parseInt(tag.get('value')))
 			.filter(value => value > 0);
-		console.log('leaderboard tag changes at root', leaderboardTags);
+		// console.log('leaderboard tag changes at root', leaderboardTags);
 	}
 	return !leaderboardTags || leaderboardTags.length === 0 ? 0 : leaderboardTags[leaderboardTags.length - 1];
 };
