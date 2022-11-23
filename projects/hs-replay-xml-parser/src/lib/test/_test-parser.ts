@@ -8,6 +8,6 @@ const test = async () => {
 	// const stats = parseBattlegroundsGame(xml, null, null, null);
 	// console.log('stats', stats);
 	const replay = parseHsReplayString(xml, allCards);
-	console.log('replay', replay.mainPlayerId, replay.mainPlayerEntityId, replay.result);
+	console.log('replay', replay.mainPlayerId, replay.mainPlayerEntityId, replay.result, replay.mainPlayerName);
 };
 test();
