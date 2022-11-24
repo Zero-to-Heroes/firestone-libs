@@ -18,7 +18,7 @@
                         "main": "src/main.ts",
                         "polyfills": "src/polyfills.ts",
                         "tsConfig": "tsconfig.app.json",
-                        "aot": false,
+                        "aot": true,
                         "assets": ["src/favicon.ico", "src/assets"],
                         "styles": ["src/styles.css"],
                         "scripts": []
@@ -36,7 +36,6 @@
                             "sourceMap": false,
                             "extractCss": true,
                             "namedChunks": false,
-                            "aot": true,
                             "extractLicenses": true,
                             "vendorChunk": false,
                             "buildOptimizer": true,
@@ -121,7 +120,12 @@
                         "tsConfig": "projects/replay-parser/tsconfig.lib.json",
                         "project": "projects/replay-parser/ng-package.json"
                     }
-                },
+                ,          "configurations": {
+            "production": {
+              "tsConfig": "projects/replay-parser/tsconfig.lib.prod.json"
+            }
+          }
+},
                 "test": {
                     "builder": "@angular-devkit/build-angular:karma",
                     "options": {
@@ -154,7 +158,12 @@
                         "tsConfig": "projects/hs-replay-xml-parser/tsconfig.lib.json",
                         "project": "projects/hs-replay-xml-parser/ng-package.json"
                     }
-                },
+                ,          "configurations": {
+            "production": {
+              "tsConfig": "projects/hs-replay-xml-parser/tsconfig.lib.prod.json"
+            }
+          }
+},
                 "test": {
                     "builder": "@angular-devkit/build-angular:karma",
                     "options": {
@@ -189,7 +198,12 @@
                         "tsConfig": "projects/coliseum-components/tsconfig.lib.json",
                         "project": "projects/coliseum-components/ng-package.json"
                     }
-                },
+                ,          "configurations": {
+            "production": {
+              "tsConfig": "projects/coliseum-components/tsconfig.lib.prod.json"
+            }
+          }
+},
                 "test": {
                     "builder": "@angular-devkit/build-angular:karma",
                     "options": {
@@ -224,7 +238,12 @@
                         "tsConfig": "projects/achievements/tsconfig.lib.json",
                         "project": "projects/achievements/ng-package.json"
                     }
-                },
+                ,          "configurations": {
+            "production": {
+              "tsConfig": "projects/achievements/tsconfig.lib.prod.json"
+            }
+          }
+},
                 "test": {
                     "builder": "@angular-devkit/build-angular:karma",
                     "options": {
