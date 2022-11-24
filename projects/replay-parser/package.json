@@ -12,16 +12,12 @@
 	"metadata": "firestone-replay-parser.metadata.json",
 	"sideEffects": false,
 	"peerDependencies": {
-		"@angular/common": "^8.2.9",
-		"@angular/core": "^8.2.9",
-		"@angular/platform-browser": "~8.2.9",
 		"@firestone-hs/simulate-bgs-battle": "^1.1.29",
 		"@firestone-hs/reference-data": "1.0.3",
 		"immutable": "3.8.2",
 		"lodash-es": "4.17.15",
 		"node-fetch": "^2.6.0",
-		"sax": "1.2.4",
-		"tslib": "^1.9.0",
+    "sax": "1.2.4",
 		"rxjs": "6.4.0"
 	},
 	"description": "This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.2.9.",
@@ -41,7 +37,10 @@
 		"parser"
 	],
 	"author": "Sébastien Tromp",
-	"license": "ISC",
+  "license": "ISC",
+  "dependencies": {
+    "tslib": "^2.0.0"
+  },
 	"bugs": {
 		"url": "https://github.com/Zero-to-Heroes/typescript-replay-parser/issues"
 	},

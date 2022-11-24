@@ -1,11 +1,10 @@
 {
 	"name": "@firestone-hs/coliseum-components",
-	"version": "0.0.21",
+  "version": "0.0.21",
+  "dependencies": {
+    "tslib": "^2.0.0"
+  },
 	"peerDependencies": {
-		"@angular/animations": "~8.2.9",
-		"@angular/common": "^8.2.9",
-		"@angular/core": "^8.2.9",
-		"@angular/forms": "8.2.9",
 		"@firestone-hs/reference-data": "^0.1.129",
 		"@firestone-hs/replay-parser": "^1.1.40",
 		"ng2-fittext": "^1.2.8"

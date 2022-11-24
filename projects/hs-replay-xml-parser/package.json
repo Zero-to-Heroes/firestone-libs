@@ -22,7 +22,8 @@
 		"@types/elementtree": "^0.1.0",
 		"big-integer": "^1.6.48",
 		"elementtree": "^0.1.7",
-		"immutable": "3.8.2"
+    "immutable": "3.8.2",
+    "tslib": "^2.0.0"
 	},
 	"devDependencies": {
 		"@types/aws-lambda": "8.10.31",
