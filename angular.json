@@ -232,7 +232,6 @@
       }
     }
   },
-  "defaultProject": "replay-action-parser",
   "cli": {
     "analytics": false
   }
