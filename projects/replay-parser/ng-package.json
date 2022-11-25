@@ -3,6 +3,5 @@
 	"dest": "../../dist/replay-parser",
 	"lib": {
 		"entryFile": "src/public-api.ts"
-	},
-	"whitelistedNonPeerDependencies": ["."]
+	}
 }

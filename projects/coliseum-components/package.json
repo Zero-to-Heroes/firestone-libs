@@ -6,7 +6,6 @@
 		"tslib": "^2.0.0"
 	},
 	"peerDependencies": {
-		"@firestone-hs/replay-parser": "^1.1.40",
 		"ng2-fittext": "^1.2.8"
 	}
 }

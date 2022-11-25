@@ -37,12 +37,6 @@
       ],
       "coliseum-components/*": [
         "dist/coliseum-components/*"
-      ],
-      "achievements": [
-        "dist/achievements"
-      ],
-      "achievements/*": [
-        "dist/achievements/*"
       ]
     },
     "useDefineForClassFields": false

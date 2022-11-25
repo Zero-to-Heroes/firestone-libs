@@ -1,6 +1,6 @@
 {
 	"name": "@firestone-hs/replay-parser",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"main": "bundles/firestone-replay-parser.umd.js",
 	"module": "fesm5/firestone-replay-parser.js",
 	"es2015": "fesm2015/firestone-replay-parser.js",
@@ -11,38 +11,23 @@
 	"typings": "firestone-replay-parser.d.ts",
 	"metadata": "firestone-replay-parser.metadata.json",
 	"sideEffects": false,
+	"dependencies": {
+		"tslib": "^2.0.0"
+	},
 	"peerDependencies": {
-		"@firestone-hs/simulate-bgs-battle": "^1.1.29",
-		"@firestone-hs/reference-data": "1.0.3",
 		"immutable": "3.8.2",
 		"lodash-es": "4.17.15",
 		"node-fetch": "^2.6.0",
 		"sax": "1.2.4",
 		"rxjs": "6.4.0"
 	},
-	"description": "This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.2.9.",
 	"directories": {
 		"test": "test"
-	},
-	"scripts": {
-		"test": "ng test replay-parser"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/Zero-to-Heroes/typescript-replay-parser.git"
 	},
 	"keywords": [
 		"hearthstone",
 		"replay",
 		"parser"
 	],
-	"author": "Sébastien Tromp",
-	"license": "ISC",
-	"dependencies": {
-		"tslib": "^2.0.0"
-	},
-	"bugs": {
-		"url": "https://github.com/Zero-to-Heroes/typescript-replay-parser/issues"
-	},
-	"homepage": "https://github.com/Zero-to-Heroes/typescript-replay-parser#readme"
+	"author": "Sébastien Tromp"
 }

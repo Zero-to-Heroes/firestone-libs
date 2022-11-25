@@ -110,7 +110,7 @@
       "prefix": "lib",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-ng-packagr:build",
+          "builder": "@angular-devkit/build-angular:ng-packagr:build",
           "options": {
             "tsConfig": "projects/replay-parser/tsconfig.lib.json",
             "project": "projects/replay-parser/ng-package.json"
@@ -135,38 +135,6 @@
         }
       }
     },
-    "hs-replay-xml-parser": {
-      "projectType": "library",
-      "root": "projects/hs-replay-xml-parser",
-      "sourceRoot": "projects/hs-replay-xml-parser/src",
-      "prefix": "lib",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-ng-packagr:build",
-          "options": {
-            "tsConfig": "projects/hs-replay-xml-parser/tsconfig.lib.json",
-            "project": "projects/hs-replay-xml-parser/ng-package.json"
-          },
-          "configurations": {
-            "production": {
-              "tsConfig": "projects/hs-replay-xml-parser/tsconfig.lib.prod.json"
-            }
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "projects/hs-replay-xml-parser/tsconfig.lib.json",
-              "projects/hs-replay-xml-parser/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
-          }
-        }
-      }
-    },
     "coliseum-components": {
       "projectType": "library",
       "root": "projects/coliseum-components",
@@ -174,7 +142,7 @@
       "prefix": "lib",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-ng-packagr:build",
+          "builder": "@angular-devkit/build-angular:ng-packagr:build",
           "options": {
             "tsConfig": "projects/coliseum-components/tsconfig.lib.json",
             "project": "projects/coliseum-components/ng-package.json"
@@ -191,38 +159,6 @@
             "tsConfig": [
               "projects/coliseum-components/tsconfig.lib.json",
               "projects/coliseum-components/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
-          }
-        }
-      }
-    },
-    "achievements": {
-      "projectType": "library",
-      "root": "projects/achievements",
-      "sourceRoot": "projects/achievements/src",
-      "prefix": "lib",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-ng-packagr:build",
-          "options": {
-            "tsConfig": "projects/achievements/tsconfig.lib.json",
-            "project": "projects/achievements/ng-package.json"
-          },
-          "configurations": {
-            "production": {
-              "tsConfig": "projects/achievements/tsconfig.lib.prod.json"
-            }
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "projects/achievements/tsconfig.lib.json",
-              "projects/achievements/tsconfig.spec.json"
             ],
             "exclude": [
               "**/node_modules/**"
