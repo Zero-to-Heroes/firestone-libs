@@ -24,4 +24,4 @@ rm -rf dist/replay-parser/ && ng build replay-parser && 'cp' -rf dist/replay-par
 
 rm -rf dist/replay-parser/ && ng build replay-parser && 'cp' -rf dist/replay-parser/ /g/Source/zerotoheroes/firestone/core/node_modules/\@firestone-hs/
 
-rm -rf dist/replay-parser/ && ng build replay-parser && npm publish dist/replay-parser --access public
+rm -rf dist/replay-parser/ && ng build replay-parser --configuration production && npm publish ./dist/replay-parser --access public

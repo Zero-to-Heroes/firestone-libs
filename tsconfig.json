@@ -26,12 +26,6 @@
       "replay-parser/*": [
         "dist/replay-parser/*"
       ],
-      "hs-replay-xml-parser": [
-        "dist/hs-replay-xml-parser"
-      ],
-      "hs-replay-xml-parser/*": [
-        "dist/hs-replay-xml-parser/*"
-      ],
       "coliseum-components": [
         "dist/coliseum-components"
       ],
