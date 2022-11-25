@@ -6,4 +6,4 @@ TODO:
 
 rm -rf dist/coliseum-components/ && ng build coliseum-components && 'cp' -rf dist/coliseum-components/ /e/Source/zerotoheroes/firestone/core/node_modules/\@firestone-hs/
 
-rm -rf dist/coliseum-components/ && ng build coliseum-components && npm publish dist/coliseum-components --access public
+rm -rf dist/coliseum-components/ && ng build coliseum-components --configuration production && npm publish ./dist/coliseum-components --access public
