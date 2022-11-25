@@ -104,7 +104,7 @@ export class GameParserService {
 		}
 
 		console.log('preparing entity / acrd ID mapping');
-		let entityCardId: Map<number, string> = Map.of();
+		let entityCardId: Map<number, string> = Map([]);
 		const fullEntityIdCardIdMatcher = new RegExp(/id="(.*?)" cardID="(.*?)"/g);
 		const fullEntityMatchResult = replayAsString.match(fullEntityIdCardIdMatcher);
 		for (let match of fullEntityMatchResult) {

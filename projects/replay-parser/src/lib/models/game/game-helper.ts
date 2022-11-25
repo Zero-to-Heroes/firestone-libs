@@ -14,6 +14,7 @@ export class GameHepler {
 			.filter((entity: Entity) => entity.getTag(GameTag.CONTROLLER) === playerId)
 			.filter((entity: Entity) => entity.getTag(GameTag.ZONE) === Zone.HAND)
 			.sortBy((entity: Entity) => entity.getTag(GameTag.ZONE_POSITION))
+			.valueSeq()
 			.toArray();
 	}
 
@@ -22,6 +23,11 @@ export class GameHepler {
 	}
 
 	public static getGameEntity(entities: Map<number, Entity>): Entity {
-		return entities ? entities.toArray().find(entity => entity instanceof GameEntity) : null;
+		return entities
+			? entities
+					.valueSeq()
+					.toArray()
+					.find(entity => entity instanceof GameEntity)
+			: null;
 	}
 }

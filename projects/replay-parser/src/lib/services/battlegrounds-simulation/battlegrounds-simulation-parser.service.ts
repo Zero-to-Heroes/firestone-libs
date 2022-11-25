@@ -159,7 +159,7 @@ export class BattlegroundsSimulationParserService {
 		for (const damage of damages) {
 			result[damage.targetEntityId] = (result[damage.targetEntityId] || 0) + damage.damage;
 		}
-		const arrayFromWhichToBuildMap: number[][] = Object.keys(result).map(damagedEntityId => [
+		const arrayFromWhichToBuildMap: readonly [number, number][] = Object.keys(result).map(damagedEntityId => [
 			parseInt(damagedEntityId),
 			result[damagedEntityId],
 		]);
@@ -212,7 +212,7 @@ export class BattlegroundsSimulationParserService {
 			...friendlyEntities, 
 			...opponentEntities
 		];
-		const mapEntries = allEntities.map(entity => [entity.id, entity]);
+		const mapEntries: readonly [number, Entity][] = allEntities.map(entity => [entity.id, entity]);
 		// console.log('map entries', mapEntries);
 		const result: Map<number, Entity> = Map(mapEntries);
 		// console.log('built entities', result.get(1), result);

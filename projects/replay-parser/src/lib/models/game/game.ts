@@ -12,7 +12,7 @@ export class Game {
 	readonly formatType: number;
 	readonly scenarioID: number;
 
-	readonly entitiesBeforeMulligan: Map<number, Entity> = Map.of();
+	readonly entitiesBeforeMulligan: Map<number, Entity> = Map();
 
 	private constructor() {}
 

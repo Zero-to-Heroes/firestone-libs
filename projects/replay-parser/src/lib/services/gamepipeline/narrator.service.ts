@@ -14,7 +14,7 @@ export class NarratorService {
 		const numberOfTurns = turnsWithActions.size;
 		// // console.log('getting turn', i, game.turns.toJS());
 		const turn = game.turns.get(numberOfTurns - 1);
-		let allEntitiesSoFar: Map<number, Entity> = Map.of();
+		let allEntitiesSoFar: Map<number, Entity> = Map();
 		const enrichedActions = turn.actions.map(action => {
 			try {
 				allEntitiesSoFar = allEntitiesSoFar.merge(action.entities);

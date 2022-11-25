@@ -174,17 +174,17 @@ export class GamePopulationService {
 		if (item.tag.tag === GameTag.SECRET && item.tag.value === 1) {
 			const entity: Entity = entities
 				.get(item.tag.entity)
-				.update({ tags: fromJS({ [GameTag[item.tag.tag]]: 1 }) });
+				.update({ tags: Map({ [GameTag[item.tag.tag]]: 1 }) });
 			return entities.set(entity.id, entity);
 		} else if (item.tag.tag === GameTag.QUEST && item.tag.value === 1) {
 			const entity: Entity = entities
 				.get(item.tag.entity)
-				.update({ tags: fromJS({ [GameTag[item.tag.tag]]: 1 }) });
+				.update({ tags: Map({ [GameTag[item.tag.tag]]: 1 }) });
 			return entities.set(entity.id, entity);
 		} else if (item.tag.tag === GameTag.PARENT_CARD) {
 			const entity: Entity = entities
 				.get(item.tag.entity)
-				.update({ tags: fromJS({ [GameTag[item.tag.tag]]: item.tag.value }) });
+				.update({ tags: Map({ [GameTag[item.tag.tag]]: item.tag.value }) });
 			return entities.set(entity.id, entity);
 		}
 		return entities;

@@ -39,6 +39,7 @@ export class MulliganParserService {
 		// 	action.entities.get(74).tags.toJS(),
 		// );
 		const mulliganEntities = action.entities
+			.valueSeq()
 			.toArray()
 			.filter(entity => entity.getTag(GameTag.ZONE) === Zone.HAND)
 			.filter(entity => entity.cardID !== 'GAME_005') // Don't show the coin yet
@@ -58,10 +59,8 @@ export class MulliganParserService {
 			isMulligan = false;
 		} else if (
 			previousAction &&
-			previousAction.entities
-				.toArray()
-				.find(entity => entity instanceof GameEntity)
-				.getTag(GameTag.STEP) === Step.BEGIN_MULLIGAN
+			previousAction.entities.find(entity => entity instanceof GameEntity).getTag(GameTag.STEP) ===
+				Step.BEGIN_MULLIGAN
 		) {
 			isMulligan = previousAction.isMulligan;
 		}

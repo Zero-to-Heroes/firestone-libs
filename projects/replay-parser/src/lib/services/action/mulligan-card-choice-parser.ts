@@ -118,6 +118,7 @@ export class MulliganCardChoiceParser implements Parser {
 	private getHandEntityIds(entities: Map<number, Entity>, playerEntityId: number): readonly number[] {
 		const playerEntity = ActionHelper.getOwner(entities, playerEntityId);
 		return entities
+			.valueSeq()
 			.toArray()
 			.filter(entity => entity.getTag(GameTag.CONTROLLER) === playerEntity.playerId)
 			.filter(entity => entity.getTag(GameTag.ZONE) === Zone.HAND)

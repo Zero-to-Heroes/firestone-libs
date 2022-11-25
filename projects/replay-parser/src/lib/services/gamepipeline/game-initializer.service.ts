@@ -12,9 +12,10 @@ import { PlayerEntity } from '../../models/game/player-entity';
 export class GameInitializerService {
 	public initializePlayers(game: Game, entities: Map<number, Entity>): Game {
 		const players: PlayerEntity[] = entities
+			.valueSeq()
+			.toArray()
 			.filter((entity: Entity) => entity.getCardType() === CardType.PLAYER)
-			.map(entity => entity as PlayerEntity)
-			.toArray();
+			.map(entity => entity as PlayerEntity);
 		let player1 = players.find(player => player.isMainPlayer);
 		let player2 = players.find(player => !player.isMainPlayer);
 		if (!player1) {
