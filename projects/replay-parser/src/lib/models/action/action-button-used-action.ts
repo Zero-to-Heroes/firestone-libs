@@ -51,7 +51,7 @@ export class ActionButtonUsedAction extends Action {
 	}
 
 	private buildVerb(card): string {
-		// console.log('building verb for', card, card.name && card.name.toLowerCase().indexOf('tavern tier'));
+		// // console.log('building verb for', card, card.name && card.name.toLowerCase().indexOf('tavern tier'));
 		if (!card.name) {
 			return 'uses';
 		}

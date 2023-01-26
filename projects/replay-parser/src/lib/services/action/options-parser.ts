@@ -36,7 +36,7 @@ export class OptionsParser implements Parser {
 	}
 
 	public reduce(actions: readonly Action[]): readonly Action[] {
-		// console.log('reducing', actions);
+		// // console.log('reducing', actions);
 		return ActionHelper.combineActions<Action>(
 			actions,
 			(previous, current) => this.shouldMergeActions(previous, current),
@@ -45,12 +45,12 @@ export class OptionsParser implements Parser {
 	}
 
 	private shouldMergeActions(previousAction: Action, currentAction: Action): boolean {
-		// console.log('should merge?', previousAction, currentAction, new Error().stack);
+		// // console.log('should merge?', previousAction, currentAction, new Error().stack);
 		return previousAction && currentAction instanceof OptionsAction;
 	}
 
 	private mergeActions(previousAction: Action, currentAction: Action): Action {
-		// console.log('merging actions', previousAction, currentAction);
+		// // console.log('merging actions', previousAction, currentAction);
 		return previousAction.updateAction({
 			index: currentAction.index,
 			entities: currentAction.entities,

@@ -82,10 +82,10 @@ export class ActionHelper {
 	): readonly Action[] {
 		const result: Action[] = [];
 		let previousAction: Action;
-		// console.log('considering actions to merge', actions);
+		// // console.log('considering actions to merge', actions);
 		for (let i = 0; i < actions.length; i++) {
 			const currentAction = actions[i];
-			// console.log(
+			// // console.log(
 			// 	'reduce 150',
 			// 	previousAction && previousAction.entities.get(150) && previousAction.entities.get(150).tags.toJS(),
 			// 	currentAction && currentAction.entities.get(150) && currentAction.entities.get(150).tags.toJS(),
@@ -93,17 +93,17 @@ export class ActionHelper {
 			// 	currentAction,
 			// );
 			if (shouldMerge(previousAction, currentAction)) {
-				// console.log('merging');
+				// // console.log('merging');
 				const index = result.indexOf(previousAction);
 				previousAction = combiner(previousAction as T, currentAction as T);
-				// console.log(
+				// // console.log(
 				// 	'new previous action',
 				// 	previousAction.entities.get(150) && previousAction.entities.get(150).tags.toJS(),
 				// 	previousAction,
 				// );
 				result[index] = previousAction;
 			} else if (shouldSwap && shouldSwap(previousAction, currentAction)) {
-				// console.log('swapping', previousAction, currentAction);
+				// // console.log('swapping', previousAction, currentAction);
 				const index = result.indexOf(previousAction);
 				const previousEntities = previousAction.entities;
 				const previousIndex = previousAction.index;
@@ -122,12 +122,12 @@ export class ActionHelper {
 					timestamp: currentTs,
 				} as Action);
 			} else {
-				// console.log('doing nothing');
+				// // console.log('doing nothing');
 				previousAction = currentAction;
 				result.push(currentAction);
 			}
 		}
-		// console.log(
+		// // console.log(
 		// 	'finished',
 		// 	result[result.length - 1].entities.get(150) && result[result.length - 1].entities.get(150).tags.toJS(),
 		// );

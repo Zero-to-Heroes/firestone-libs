@@ -1,6 +1,6 @@
 {
 	"name": "@firestone-hs/replay-parser",
-	"version": "1.2.3",
+	"version": "1.2.9",
 	"main": "bundles/firestone-replay-parser.umd.js",
 	"module": "fesm5/firestone-replay-parser.js",
 	"es2015": "fesm2015/firestone-replay-parser.js",
@@ -17,7 +17,6 @@
 	"peerDependencies": {
 		"lodash-es": "4.17.15",
 		"node-fetch": "^2.6.0",
-		"sax": "1.2.4",
 		"rxjs": "7.5.0"
 	},
 	"directories": {

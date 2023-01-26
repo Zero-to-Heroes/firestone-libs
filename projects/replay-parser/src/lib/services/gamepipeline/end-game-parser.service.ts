@@ -16,7 +16,7 @@ export class EndGameParserService {
 		let turns = game.turns;
 		const lastTurn = turns.get(turns.size - 1);
 		const enrichedLastTurn = this.enrichTurn(lastTurn);
-		// console.log('previous', turns.get(turns.size - 2));
+		// // console.log('previous', turns.get(turns.size - 2));
 		turns = turns.set(turns.size - 1, enrichedLastTurn);
 		return Game.createGame(game, { turns } as Game);
 	}
@@ -32,7 +32,7 @@ export class EndGameParserService {
 		}
 
 		if (!(turn.actions[turn.actions.length - 1] instanceof EndGameAction)) {
-			// console.log('last action is not an endgame, returning');
+			// // console.log('last action is not an endgame, returning');
 			return turn;
 		}
 		const newEndGame = this.enrichAction(turn.actions[turn.actions.length - 1] as EndGameAction);

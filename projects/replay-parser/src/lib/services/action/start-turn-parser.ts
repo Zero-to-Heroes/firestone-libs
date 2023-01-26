@@ -25,7 +25,7 @@ export class StartTurnParser implements Parser {
 		entitiesBeforeAction: Map<number, Entity>,
 		history: readonly HistoryItem[],
 	): Action[] {
-		// console.log('current turn?', currentTurn);
+		// // console.log('current turn?', currentTurn);
 		const activePlayerId = entitiesBeforeAction
 			.filter(entity => entity.getTag(GameTag.CURRENT_PLAYER) === 1)
 			.map(entity => entity as PlayerEntity)
@@ -50,7 +50,7 @@ export class StartTurnParser implements Parser {
 		}
 		// HACK: First turn usuall doesn't contain anything useful in battlegrounds
 		if (currentTurn <= 2 && isBattlegrounds) {
-			// console.log('visual forced', 1, item, currentTurn);
+			// // console.log('visual forced', 1, item, currentTurn);
 			result.push(
 				BaconBoardVisualStateAction.create(
 					{

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CardType, GameTag, GameType } from '@firestone-hs/reference-data';
-import { fromJS, Map } from 'immutable';
+import { Map } from 'immutable';
 import { Entity } from '../../models/game/entity';
 import { GameEntity } from '../../models/game/game-entity';
 import { PlayerEntity } from '../../models/game/player-entity';
@@ -105,9 +105,9 @@ export class GamePopulationService {
 		let entity: GameEntity = GameEntity.create(base).update(historyItem.entityDefintion);
 		// Battlegrounds doesn't have the right board state set at start
 		if (historyItem.gameType === GameType.GT_BATTLEGROUNDS) {
-			// console.log('initializing game entity with visual state', entity.tags.toJS(), entity);
+			// // console.log('initializing game entity with visual state', entity.tags.toJS(), entity);
 			entity = entity.updateTag(GameTag.BOARD_VISUAL_STATE, 1);
-			// console.log('updated', entity.tags.toJS(), entity);
+			// // console.log('updated', entity.tags.toJS(), entity);
 		}
 		return entities.set(entity.id, entity);
 	}
@@ -125,7 +125,7 @@ export class GamePopulationService {
 			newAttributes.cardID = historyItem.entityDefintion.cardID;
 		}
 		// if (historyItem.entityDefintion.id === 73 || historyItem.entityDefintion.id === 74) {
-		// 	// console.log('enriching', historyItem);
+		// 	// // console.log('enriching', historyItem);
 		// }
 		const entity: Entity = entities
 			.get(historyItem.entityDefintion.id, Entity.create({ id: historyItem.entityDefintion.id } as Entity))
@@ -143,7 +143,7 @@ export class GamePopulationService {
 			newAttributes.cardID = historyItem.entityDefintion.cardID;
 		}
 		// if (historyItem.entityDefintion.id === 73 || historyItem.entityDefintion.id === 74) {
-		// 	// console.log('enriching', historyItem);
+		// 	// // console.log('enriching', historyItem);
 		// }
 		const entity: Entity = entities
 			.get(historyItem.entityDefintion.id, Entity.create({ id: historyItem.entityDefintion.id } as Entity))
@@ -169,17 +169,13 @@ export class GamePopulationService {
 
 	private addTagInformation(item: TagChangeHistoryItem, entities: Map<number, Entity>): Map<number, Entity> {
 		// if (item.tag.entity === 73 || item.tag.entity === 74) {
-		// 	// console.log('enriching', item);
+		// 	// // console.log('enriching', item);
 		// }
 		if (item.tag.tag === GameTag.SECRET && item.tag.value === 1) {
-			const entity: Entity = entities
-				.get(item.tag.entity)
-				.update({ tags: Map({ [GameTag[item.tag.tag]]: 1 }) });
+			const entity: Entity = entities.get(item.tag.entity).update({ tags: Map({ [GameTag[item.tag.tag]]: 1 }) });
 			return entities.set(entity.id, entity);
 		} else if (item.tag.tag === GameTag.QUEST && item.tag.value === 1) {
-			const entity: Entity = entities
-				.get(item.tag.entity)
-				.update({ tags: Map({ [GameTag[item.tag.tag]]: 1 }) });
+			const entity: Entity = entities.get(item.tag.entity).update({ tags: Map({ [GameTag[item.tag.tag]]: 1 }) });
 			return entities.set(entity.id, entity);
 		} else if (item.tag.tag === GameTag.PARENT_CARD) {
 			const entity: Entity = entities
@@ -192,7 +188,7 @@ export class GamePopulationService {
 
 	private addEntityInformation(item: ShowEntityHistoryItem, entities: Map<number, Entity>): Map<number, Entity> {
 		// if (item.entityDefintion.id === 73 || item.entityDefintion.id === 74) {
-		// 	// console.log('enriching', item);
+		// 	// // console.log('enriching', item);
 		// }
 		let result = entities;
 		if (item.entityDefintion.tags.get(GameTag[GameTag.SECRET]) === 1) {

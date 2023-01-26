@@ -22,7 +22,7 @@ export class BaconBoardVisualStateParser implements Parser {
 		history: readonly HistoryItem[],
 	): Action[] {
 		// TODO: add checks that we are indeed in a Battlegrounds game?
-		// console.log('visual', item.tag.value, item);
+		// // console.log('visual', item.tag.value, item);
 		return [
 			BaconBoardVisualStateAction.create(
 				{

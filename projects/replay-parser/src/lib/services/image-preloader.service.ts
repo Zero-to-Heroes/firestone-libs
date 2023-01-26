@@ -124,13 +124,13 @@ export class ImagePreloaderService {
 	public *preloadImages(history: readonly HistoryItem[]) {
 		const imageUrls = this.buildImageUrls(history);
 		// yield;
-		// // console.log('preloading ' + imageUrls.length + ' images');
+		// // // console.log('preloading ' + imageUrls.length + ' images');
 		for (let i = 0; i < imageUrls.length; i++) {
 			const imageUrl = imageUrls[i];
-			// // console.log('[image-preloader] preloading image', imageUrl);
+			// // // console.log('[image-preloader] preloading image', imageUrl);
 			const image = new Image();
 			image.onload = () =>
-				// // console.log('[image-preloader] preloaded image', imageUrl);
+				// // // console.log('[image-preloader] preloaded image', imageUrl);
 				(image.src = imageUrl);
 			// if (i % 15 === 0) {
 			// 	yield;

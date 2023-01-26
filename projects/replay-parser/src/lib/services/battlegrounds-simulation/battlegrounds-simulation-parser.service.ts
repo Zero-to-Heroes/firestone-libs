@@ -36,7 +36,7 @@ export class BattlegroundsSimulationParserService {
 		} as Game);
 		game = this.narrator.populateActionTextForLastTurn(game);
 		game = this.narrator.createGameStoryForLastTurn(game);
-		// console.log('built game', game, game.turns.toJS());
+		// // console.log('built game', game, game.turns.toJS());
 		return game;
 	}
 
@@ -61,7 +61,7 @@ export class BattlegroundsSimulationParserService {
 				} as StartTurnAction,
 				this.allCards,
 			);
-			// console.log('built attack action', result, result.entities.toJS());
+			// // console.log('built attack action', result, result.entities.toJS());
 			return result;
 		} else if (action.type === 'player-attack') {
 			const result = AttackAction.create(
@@ -74,7 +74,7 @@ export class BattlegroundsSimulationParserService {
 				} as AttackAction,
 				this.allCards,
 			);
-			// console.log('built attack action', result, result.entities.toJS());
+			// // console.log('built attack action', result, result.entities.toJS());
 			return result;
 		} else if (action.type === 'opponent-attack') {
 			const result = AttackAction.create(
@@ -87,7 +87,7 @@ export class BattlegroundsSimulationParserService {
 				} as AttackAction,
 				this.allCards,
 			);
-			// console.log('built attack action', result, result.entities.toJS());
+			// // console.log('built attack action', result, result.entities.toJS());
 			return result;
 		} else if (action.type === 'attack') {
 			const result = AttackAction.create(
@@ -100,7 +100,7 @@ export class BattlegroundsSimulationParserService {
 				} as AttackAction,
 				this.allCards,
 			);
-			// console.log('built attack action', result, result.entities.toJS());
+			// // console.log('built attack action', result, result.entities.toJS());
 			return result;
 		} else if (action.type === 'damage') {
 			return DamageAction.create(
@@ -111,7 +111,7 @@ export class BattlegroundsSimulationParserService {
 				this.allCards,
 			);
 		} else if (action.type === 'power-target') {
-			// console.log('parsing powertargetaction', action);
+			// // console.log('parsing powertargetaction', action);
 			const targetIds: readonly number[] = action.targetEntityIds ?? [action.targetEntityId];
 			return PowerTargetAction.create(
 				{
@@ -163,7 +163,7 @@ export class BattlegroundsSimulationParserService {
 			parseInt(damagedEntityId),
 			result[damagedEntityId],
 		]);
-		// console.log('building damage array', arrayFromWhichToBuildMap, result, damages);
+		// // console.log('building damage array', arrayFromWhichToBuildMap, result, damages);
 		return Map(arrayFromWhichToBuildMap);
 	}
 
@@ -179,7 +179,7 @@ export class BattlegroundsSimulationParserService {
 			// ...(action.spawns || []), // They are already present on the board
 			...(action.deaths || []),
 		];
-		// console.log('parsing action', action.type, allSourceEntities, action);
+		// // console.log('parsing action', action.type, allSourceEntities, action);
 		const friendlyEntities: readonly Entity[] = allSourceEntities
 			.filter(entity => entity.friendly)
 			.map((boardEntity, index) =>
@@ -201,7 +201,7 @@ export class BattlegroundsSimulationParserService {
 				),
 			);
 			
-		// console.log('split entities', friendlyEntities, opponentEntities);
+		// // console.log('split entities', friendlyEntities, opponentEntities);
 		const allEntities: readonly Entity[] = [
 			Object.assign(new PlayerEntity(), playerEntity, { 
 				damageForThisAction: damages && damages.get(playerEntity.id) ? damages.get(playerEntity.id) : undefined 
@@ -213,9 +213,9 @@ export class BattlegroundsSimulationParserService {
 			...opponentEntities
 		];
 		const mapEntries: readonly [number, Entity][] = allEntities.map(entity => [entity.id, entity]);
-		// console.log('map entries', mapEntries);
+		// // console.log('map entries', mapEntries);
 		const result: Map<number, Entity> = Map(mapEntries);
-		// console.log('built entities', result.get(1), result);
+		// // console.log('built entities', result.get(1), result);
 		return result;
 	}
 

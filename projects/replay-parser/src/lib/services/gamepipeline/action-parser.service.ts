@@ -4,7 +4,7 @@ import { Action } from '../../models/action/action';
 import { Entity } from '../../models/game/entity';
 import { Game } from '../../models/game/game';
 import { HistoryItem } from '../../models/history/history-item';
-import { ActionParserConfig, SummonAction } from '../../models/models';
+import { ActionParserConfig } from '../../models/models';
 import { ActionButtonUsedParser } from '../action/action-button-used-parser';
 import { AttachingEnchantmentParser } from '../action/attaching-enchantment-parser';
 import { AttackParser } from '../action/attack-parser';
@@ -84,7 +84,7 @@ export class ActionParserService {
 		// const start = Date.now();
 		// Because mulligan is effectively index -1; since there is a 0 turn after that
 		let currentTurn = game.turns.size - 1;
-		// console.log('current turn at start', currentTurn);
+		// // console.log('current turn at start', currentTurn);
 		let actionsForTurn: readonly Action[] = [];
 		let previousStateEntities: Map<number, Entity> = entities;
 		let previousProcessedItem: HistoryItem = history[0];
@@ -99,7 +99,7 @@ export class ActionParserService {
 			const entitiesBeforeAction = previousStateEntities;
 			previousStateEntities = this.stateProcessorService.applyHistoryItem(previousStateEntities, item);
 			//if (debug) {
-			//	console.log('is entity present', entitiesBeforeAction.has(35), previousStateEntities.has(35), previousStateEntities.get(35)?.tags?.toJS());
+			//	// console.log('is entity present', entitiesBeforeAction.has(35), previousStateEntities.has(35), previousStateEntities.get(35)?.tags?.toJS());
 			//}
 			previousProcessedItem = item;
 			actionParsers.forEach(parser => {
@@ -107,7 +107,7 @@ export class ActionParserService {
 					// const start = Date.now();
 					// When we perform an action, we want to show the result of the state updates until the next action is
 					// played.
-					// console.log('parser might apply', parser, item);
+					// // console.log('parser might apply', parser, item);
 					const actions: Action[] = parser.parse(
 						item,
 						currentTurn,
@@ -116,7 +116,7 @@ export class ActionParserService {
 						game.players,
 					);
 					if (actions && actions.length > 0) {
-						// console.log('parser applies', parser, item, actions);
+						// // console.log('parser applies', parser, item, actions);
 						actionsForTurn = this.sortActions(
 							actionsForTurn,
 							(a: Action, b: Action) => a.index - b.index || a.timestamp - b.timestamp,
@@ -133,7 +133,7 @@ export class ActionParserService {
 			history,
 			previousProcessedItem,
 		);
-		// console.log(
+		// // console.log(
 		// 	'after history applied until end 35',
 		// 	previousStateEntities.get(35) && previousStateEntities.get(35).tags.toJS(),
 		// );
@@ -144,42 +144,42 @@ export class ActionParserService {
 			(a: Action, b: Action) => a.index - b.index || a.timestamp - b.timestamp,
 		);
 		actionsForTurn = this.fillMissingEntities(actionsForTurn, previousStateEntities);
-		// console.log('actionsForTurn after fillMissingEntities', actionsForTurn);
-		// console.log(
+		// // console.log('actionsForTurn after fillMissingEntities', actionsForTurn);
+		// // console.log(
 		// 	'after sortActions 150',
 		// 	actionsForTurn[actionsForTurn.length - 1].entities.get(150) &&
 		// 		actionsForTurn[actionsForTurn.length - 1].entities.get(150).tags.toJS(),
 		// );
-		// console.log('actionsForTurn after sortActions', actionsForTurn[actionsForTurn.length - 1].entities.toJS());
+		// // console.log('actionsForTurn after sortActions', actionsForTurn[actionsForTurn.length - 1].entities.toJS());
 		// if (debug) {
-		// 	console.log('is entity present after sort', actionsForTurn[actionsForTurn.length - 1].entities.has(507));
+		// 	// console.log('is entity present after sort', actionsForTurn[actionsForTurn.length - 1].entities.has(507));
 		// }
 		// Give an opportunity to each parser to combine the actions it produced by merging them
 		// For instance, if we two card draws in a row, we might want to display them as a single
 		// action that draws two cards
 		actionsForTurn = this.reduceActions(actionParsers, actionsForTurn);
-		// console.log(
+		// // console.log(
 		// 	'after reduceActions 150',
 		// 	actionsForTurn[actionsForTurn.length - 1].entities.get(150) &&
 		// 		actionsForTurn[actionsForTurn.length - 1].entities.get(150).tags.toJS(),
 		// );
-		// console.log('actionsForTurn after reduceActions', actionsForTurn[actionsForTurn.length - 1].entities.toJS());
+		// // console.log('actionsForTurn after reduceActions', actionsForTurn[actionsForTurn.length - 1].entities.toJS());
 		actionsForTurn = this.addDamageToEntities(actionsForTurn, previousStateEntities);
-		// console.log(
+		// // console.log(
 		// 	'after addDamageToEntities 150',
 		// 	actionsForTurn[actionsForTurn.length - 1].entities.get(150) &&
 		// 		actionsForTurn[actionsForTurn.length - 1].entities.get(150).tags.toJS(),
 		// );
-		// console.log(
+		// // console.log(
 		// 	'actionsForTurn after addDamageToEntities',
 		// 	actionsForTurn[actionsForTurn.length - 1].entities.toJS(),
 		// );
 		// if (debug) {
-		// 	console.log('is entity present after damage', actionsForTurn[actionsForTurn.length - 1].entities.has(507));
+		// 	// console.log('is entity present after damage', actionsForTurn[actionsForTurn.length - 1].entities.has(507));
 		// }
 		try {
 			if (currentTurn < 0) {
-				// console.log('handling game init entity updates');
+				// // console.log('handling game init entity updates');
 				return Game.createGame(game, { entitiesBeforeMulligan: previousStateEntities } as Game);
 			}
 			if (!game.turns.get(currentTurn)) {
@@ -188,9 +188,9 @@ export class ActionParserService {
 			const turnWithNewActions = game.turns.get(currentTurn).update({ actions: actionsForTurn });
 			const turnNumber = turnWithNewActions.turn === 'mulligan' ? 0 : parseInt(turnWithNewActions.turn);
 			const turns = game.turns.set(turnNumber, turnWithNewActions);
-			// console.log('turnWithNewActions', turnNumber, turnWithNewActions.actions);
+			// // console.log('turnWithNewActions', turnNumber, turnWithNewActions.actions);
 			const result = Game.createGame(game, { turns } as Game);
-			// console.log('oriejg', result.getLatestParsedState().toJS());
+			// // console.log('oriejg', result.getLatestParsedState().toJS());
 			return result;
 		} catch (e) {
 			console.warn(currentTurn, game.turns.toJS(), actionsForTurn);
@@ -210,7 +210,7 @@ export class ActionParserService {
 				newActionsForTurn.push(actionsForTurn[i]);
 			} else {
 				//if (actionsForTurn[i] instanceof SummonAction) {
-				//	console.log(
+				//	// console.log(
 				//		'filling missing entities for',
 				//		previousStateEntities.get(35) && previousStateEntities.get(35).tags.toJS(),
 				//		actionsForTurn[i],
@@ -261,19 +261,19 @@ export class ActionParserService {
 	private reduceActions(actionParsers: Parser[], actionsForTurn: readonly Action[]): readonly Action[] {
 		let reducedActions = actionsForTurn;
 		for (const parser of actionParsers) {
-			// console.log('reducing', parser, actionsForTurn);
+			// // console.log('reducing', parser, actionsForTurn);
 			reducedActions = parser.reduce(reducedActions);
 		}
-		// console.log('finished round of reduces');
+		// // console.log('finished round of reduces');
 		// Because the different parsers can interact with each other, we need to apply all
 		// of them until the result doesn't change anymore
 		// This looks heavy in perf, but there aren't many actions, and it lets us
 		// handle each action type independently, which makes for more separated concerns
 		if (!this.areEqual(reducedActions, actionsForTurn)) {
-			// console.log('going for another round');
+			// // console.log('going for another round');
 			return this.reduceActions(actionParsers, reducedActions);
 		}
-		// console.log('fully finished');
+		// // console.log('fully finished');
 		return reducedActions;
 	}
 

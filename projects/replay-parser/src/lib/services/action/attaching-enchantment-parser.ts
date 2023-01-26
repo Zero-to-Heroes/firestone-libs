@@ -86,12 +86,12 @@ export class AttachingEnchantmentParser implements Parser {
 			(previousAction instanceof CardTargetAction || previousAction instanceof PowerTargetAction) &&
 			currentAction instanceof AttachingEnchantmentAction
 		) {
-			// console.log('merging enchantment into target?', previousAction, currentAction);
+			// // console.log('merging enchantment into target?', previousAction, currentAction);
 			if (
 				previousAction.originId === currentAction.originId &&
 				isEqual(previousAction.targetIds, currentAction.targetIds)
 			) {
-				// console.log('merging enchantment into target', previousAction, currentAction);
+				// // console.log('merging enchantment into target', previousAction, currentAction);
 				return true;
 			}
 		}

@@ -102,11 +102,11 @@ export class StateProcessorService {
 		const startIndex = history.indexOf(previousProcessedItem);
 		const futureHistory = history.slice(startIndex);
 		let newStateEntities = previousStateEntities;
-		// console.log('applying history until now', startIndex, futureHistory, history);
+		// // console.log('applying history until now', startIndex, futureHistory, history);
 		for (const historyItem of futureHistory) {
 			newStateEntities = this.applyHistoryItem(newStateEntities, historyItem);
 		}
-		// console.log('after history applied 150', newStateEntities.get(150) && newStateEntities.get(150).tags.toJS());
+		// // console.log('after history applied 150', newStateEntities.get(150) && newStateEntities.get(150).tags.toJS());
 		return newStateEntities;
 	}
 
@@ -127,7 +127,7 @@ export class StateProcessorService {
 		entities: Map<number, Entity>,
 	): Map<number, Entity> {
 		if (historyItem.entityDefintion.id === 35) {
-			console.log('applying history item', historyItem, historyItem.entityDefintion.tags?.toJS());
+			// console.log('applying history item', historyItem, historyItem.entityDefintion.tags?.toJS());
 		}
 		if (!entities.get(historyItem.entityDefintion.id)) {
 			console.warn('[state-processor] could not update entity', historyItem.entityDefintion.id);
@@ -135,11 +135,11 @@ export class StateProcessorService {
 		}
 
 		// if (historyItem.entityDefintion.id === 73 || historyItem.entityDefintion.id === 74) {
-		// 	console.log('enriching state', historyItem);
+		// 	// console.log('enriching state', historyItem);
 		// }
 		const entity: Entity = entities.get(historyItem.entityDefintion.id).update(historyItem.entityDefintion);
 		// if (entity.id === 150) {
-		// 	console.log(
+		// 	// console.log(
 		// 		'updating with 150',
 		// 		entity,
 		// 		entity.tags.toJS(),

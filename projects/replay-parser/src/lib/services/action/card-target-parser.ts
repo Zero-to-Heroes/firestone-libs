@@ -95,7 +95,7 @@ export class CardTargetParser implements Parser {
 			return;
 		}
 		if (previousAction instanceof ActionButtonUsedAction) {
-			// console.log('merging actions', previousAction, currentAction);
+			// // console.log('merging actions', previousAction, currentAction);
 			return ActionHelper.mergeIntoFirstAction(previousAction, currentAction, {
 				entities: currentAction.entities,
 				entityId: previousAction.entityId,

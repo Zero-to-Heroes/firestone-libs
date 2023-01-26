@@ -29,7 +29,7 @@ export class Game {
 			return this.entitiesBeforeMulligan;
 		}
 		const lastTurn = this.turns.get(this.turns.size - 1);
-		// console.log('last turn', lastTurn, this.turns.toJS());
+		// // console.log('last turn', lastTurn, this.turns.toJS());
 		return lastTurn.actions[lastTurn.actions.length - 1].entities;
 	}
 }

@@ -34,7 +34,7 @@ export class MulliganCardChoiceParser implements Parser {
 		// Here "playerID" actually refers to the player entity ID (and not the playerID)
 		const playerHand = this.getHandEntityIds(entitiesBeforeAction, item.tag.playerID);
 		const mulligan = playerHand.filter(entityId => keptCards.indexOf(entityId) === -1);
-		// console.log('considering choice', item, players, playerHand, mulligan);
+		// // console.log('considering choice', item, players, playerHand, mulligan);
 		if (item.tag.playerID === players[0].id) {
 			return [
 				MulliganCardChoiceAction.create(
@@ -84,7 +84,7 @@ export class MulliganCardChoiceParser implements Parser {
 			return previousAction;
 		}
 		if (previousAction instanceof MulliganCardChoiceAction) {
-			// console.log('merging into previous mulligan action', previousAction, currentAction);
+			// // console.log('merging into previous mulligan action', previousAction, currentAction);
 			return MulliganCardChoiceAction.create(
 				{
 					timestamp: previousAction.timestamp,
@@ -99,7 +99,7 @@ export class MulliganCardChoiceParser implements Parser {
 				this.allCards,
 			);
 		} else {
-			// console.log('merging into previous turn action', previousAction, currentAction);
+			// // console.log('merging into previous turn action', previousAction, currentAction);
 			return StartTurnAction.create(
 				{
 					turn: previousAction.turn,

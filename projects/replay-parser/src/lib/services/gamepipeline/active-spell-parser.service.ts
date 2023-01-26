@@ -99,7 +99,7 @@ export class ActiveSpellParserService {
 		}
 
 		if (activeSpell) {
-			// // console.log('Updating active spell', activeSpell);
+			// // // console.log('Updating active spell', activeSpell);
 			return action.updateAction({ activeSpell } as Action);
 		}
 		return action;

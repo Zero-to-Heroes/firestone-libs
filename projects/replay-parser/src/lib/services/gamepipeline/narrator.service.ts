@@ -12,7 +12,7 @@ export class NarratorService {
 	public populateActionTextForLastTurn(game: Game) {
 		let turnsWithActions = game.turns;
 		const numberOfTurns = turnsWithActions.size;
-		// // console.log('getting turn', i, game.turns.toJS());
+		// // // console.log('getting turn', i, game.turns.toJS());
 		const turn = game.turns.get(numberOfTurns - 1);
 		let allEntitiesSoFar: Map<number, Entity> = Map();
 		const enrichedActions = turn.actions.map(action => {
@@ -32,7 +32,7 @@ export class NarratorService {
 	public createGameStoryForLastTurn(game: Game): Game {
 		const allActionsInLastTurn = game.turns.last().actions;
 		const fullStoryRawForLastTurn: string = allActionsInLastTurn.map(action => action.textRaw).join('\n');
-		// // console.log('[narrator] full story', fullStoryRaw);
+		// // // console.log('[narrator] full story', fullStoryRaw);
 		return Game.createGame(game, { fullStoryRaw: game.fullStoryRaw + '\n' + fullStoryRawForLastTurn } as Game);
 	}
 }

@@ -57,8 +57,10 @@ export class GameParserService {
 			this.processingTimeout = undefined;
 		}
 
-		await this.allCards.initializeCardsDb();
-		this.logPerf('Retrieved cards DB, parsing replay', start);
+		if (!this.allCards.getCards()?.length) {
+			await this.allCards.initializeCardsDb();
+			this.logPerf('Retrieved cards DB, parsing replay', start);
+		}
 
 		const iterator: IterableIterator<[Game, number, string]> = this.createGamePipeline(
 			replayAsString,
@@ -77,10 +79,10 @@ export class GameParserService {
 	}
 
 	private buildObservableFunction(observer, iterator: IterableIterator<[Game, number, string]>) {
-		// console.log('calling next iteration');
+		// // console.log('calling next iteration');
 		try {
 			const itValue = iterator.next();
-			// console.log('calling next obersable', itValue, itValue.value);
+			// // console.log('calling next obersable', itValue, itValue.value);
 			observer.next([itValue.value[0], itValue.value[2], itValue.done]);
 			if (!itValue.done && !this.cancelled) {
 				this.processingTimeout = setTimeout(
@@ -103,7 +105,7 @@ export class GameParserService {
 			return [null, SMALL_PAUSE, 'Invalid XML replay'];
 		}
 
-		console.log('preparing entity / acrd ID mapping');
+		// console.log('[game-parser] preparing entity / acrd ID mapping');
 		let entityCardId: Map<number, string> = Map([]);
 		const fullEntityIdCardIdMatcher = new RegExp(/id="(.*?)" cardID="(.*?)"/g);
 		const fullEntityMatchResult = replayAsString.match(fullEntityIdCardIdMatcher);
@@ -116,14 +118,14 @@ export class GameParserService {
 		const showEntityIdCardIdMatcher = new RegExp(/cardID="(.*?)" entity="(.*?)"/g);
 		const showEntityMatchResult = replayAsString.match(showEntityIdCardIdMatcher);
 		for (let match of showEntityMatchResult) {
-			// console.log("updating with show', result", copy);
+			// // console.log("updating with show', result", copy);
 			const result = new RegExp(/cardID="(.*?)" entity="(.*?)"/g).exec(match);
 			if (result) {
-				// console.log('result', result);
+				// // console.log('result', result);
 				entityCardId = entityCardId.set(parseInt(result[2]), result[1]);
 			}
 		}
-		console.log('mapping done', entityCardId.size);
+		// console.log('[game-parser] mapping done', entityCardId.size);
 
 		// Do the parsing turn by turn
 		// let history: readonly HistoryItem[];
@@ -135,10 +137,10 @@ export class GameParserService {
 		while (true) {
 			const itValue = xmlParsingIterator.next();
 			const history: readonly HistoryItem[] = itValue.value;
-			// console.log('parsing for', counter, 'with history length', history.length);
+			// console.debug('[game-parser] parsing for', counter, 'with history length', history.length);
 
 			if (!history || itValue.done) {
-				// console.log('history parsing over', itValue);
+				// console.debug('[game-parser] history parsing over', itValue);
 				break;
 			}
 
@@ -150,36 +152,38 @@ export class GameParserService {
 					gameType: gameHistory.gameType,
 					scenarioID: gameHistory.scenarioID,
 				} as Game);
-				console.log('assign meta data to game', game);
+				// console.log('[game-parser] assign meta data to game', game);
 			}
 
 			// Battlegrounds tutorial
 			if (game.scenarioID === 3539) {
-				console.log('Battlegrounds tutorial not supported, returning');
+				// console.log('[game-parser] Battlegrounds tutorial not supported, returning');
 				return [null, SMALL_PAUSE, 'Batllegrounds tutorial is not supported'];
 			}
 
 			// Preload the images we'll need early on
-			const preloadIterator = this.imagePreloader.preloadImages(history);
-			while (true) {
-				const itValue = preloadIterator.next();
-				if (itValue.done) {
-					break;
-				}
-			}
+			// const preloadIterator = this.imagePreloader.preloadImages(history);
+			// while (true) {
+			// 	const itValue = preloadIterator.next();
+			// 	if (itValue.done) {
+			// 		break;
+			// 	}
+			// }
 
+			// console.log('[game-parser] will initNewEntities', game, history, entityCardId.toJS());
 			let entities = this.gamePopulationService.initNewEntities(game, history, entityCardId);
+			// console.log('[game-parser] initNewEntities', entities.size);
 			if (game.turns.size === 0) {
 				game = this.gameInitializer.initializePlayers(game, entities);
 				game = this.gameStateParser.updateEntitiesUntilMulliganState(game, entities, history);
 				entities = game.entitiesBeforeMulligan;
-				// console.log('game after populateEntitiesUntilMulliganState', game, game.turns.toJS());
+				// // console.log('game after populateEntitiesUntilMulliganState', game, game.turns.toJS());
 			}
 
 			game = this.turnParser.createTurns(game, history);
-			// console.log('game after turn creation', game.turns.size);
+			// // console.log('game after turn creation', game.turns.size);
 			game = this.actionParser.parseActions(game, entities, history, config);
-			// console.log(
+			// // console.log(
 			// 	'entity 150 parseActions',
 			// 	game.getLatestParsedState().get(150) &&
 			// 		game
@@ -187,10 +191,10 @@ export class GameParserService {
 			// 			.get(150)
 			// 			.tags.toJS(),
 			// );
-			// console.log('game after action pasring', game.getLatestParsedState().toJS());
+			// // console.log('game after action pasring', game.getLatestParsedState().toJS());
 			if (game.turns.size > 0) {
 				game = this.activePlayerParser.parseActivePlayerForLastTurn(game);
-				// console.log(
+				// // console.log(
 				// 	'entity 150 parseActivePlayerForLastTurn',
 				// 	game.getLatestParsedState().get(150) &&
 				// 		game
@@ -198,9 +202,9 @@ export class GameParserService {
 				// 			.get(150)
 				// 			.tags.toJS(),
 				// );
-				// console.log('game after parseActivePlayer', game, game.turns.toJS());
+				// // console.log('game after parseActivePlayer', game, game.turns.toJS());
 				game = this.activeSpellParser.parseActiveSpellForLastTurn(game);
-				// console.log(
+				// // console.log(
 				// 	'entity 150 parseActiveSpellForLastTurn',
 				// 	game.getLatestParsedState().get(150) &&
 				// 		game
@@ -208,9 +212,9 @@ export class GameParserService {
 				// 			.get(150)
 				// 			.tags.toJS(),
 				// );
-				// console.log('game after parseActiveSpell', game, game.turns.toJS());
+				// // console.log('game after parseActiveSpell', game, game.turns.toJS());
 				game = this.targetsParser.parseTargetsForLastTurn(game);
-				// console.log(
+				// // console.log(
 				// 	'entity 150 parseTargetsForLastTurn',
 				// 	game.getLatestParsedState().get(150) &&
 				// 		game
@@ -218,17 +222,17 @@ export class GameParserService {
 				// 			.get(150)
 				// 			.tags.toJS(),
 				// );
-				// console.log('game after parseTargets', game, game.turns.toJS());
+				// // console.log('game after parseTargets', game, game.turns.toJS());
 				if (game.turns.size === 1) {
 					game = this.mulliganParser.affectMulligan(game);
 				}
-				// console.log('game after affectMulligan', game, game.turns.toJS());
+				// // console.log('game after affectMulligan', game, game.turns.toJS());
 				game = this.endGameParser.parseEndGame(game);
-				// console.log('game after parseEndGame', game, game.turns.toJS());
+				// // console.log('game after parseEndGame', game, game.turns.toJS());
 				game = this.narrator.populateActionTextForLastTurn(game);
-				// console.log('game after populateActionText', game, game.turns.toJS());
+				// // console.log('game after populateActionText', game, game.turns.toJS());
 				game = this.narrator.createGameStoryForLastTurn(game);
-				// console.log(
+				// // console.log(
 				// 	'entity 150 createGameStoryForLastTurn',
 				// 	game.getLatestParsedState().get(150) &&
 				// 		game
@@ -236,16 +240,16 @@ export class GameParserService {
 				// 			.get(150)
 				// 			.tags.toJS(),
 				// );
-				// console.log('game after createGameStory', game, game.turns.toJS());
+				// // console.log('game after createGameStory', game, game.turns.toJS());
 				// if (counter === 4) {
 				// 	counter++;
-				// 	console.log('returning', counter);
+				// 	// console.log('returning', counter);
 				// 	return [game, SMALL_PAUSE, 'Rendering game state'];
 				// }
 				// counter++;
-				// console.log('moving on', counter);
+				// // console.log('moving on', counter);
 				// if (game.turns.size === 33) {
-				// 	console.log(
+				// 	// console.log(
 				// 		'entities at end of turn',
 				// 		game.getLatestParsedState().toJS(),
 				// 		game.getLatestParsedState().get(507),
@@ -256,18 +260,18 @@ export class GameParserService {
 			} else {
 				// if (counter++ === 3) {
 				// 	counter++;
-				// 	// console.log('returning', counter, game.entities.get(73), game.entities.get(74));
+				// 	// // console.log('returning', counter, game.entities.get(73), game.entities.get(74));
 				// 	return [game, SMALL_PAUSE, 'Rendering game state'];
 				// }
 				// counter++;
 			}
 		}
-		console.log('parsing done, returning');
+		// console.log('parsing done, returning');
 		return [game, SMALL_PAUSE, 'Rendering game state'];
 	}
 
 	private logPerf<T>(what: string, start: number, result?: T): T {
-		console.log('[perf] ', what, 'done after ', Date.now() - start, 'ms');
+		// console.log('[perf] ', what, 'done after ', Date.now() - start, 'ms');
 		return result;
 	}
 }

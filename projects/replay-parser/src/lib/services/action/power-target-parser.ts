@@ -53,7 +53,7 @@ export class PowerTargetParser implements Parser {
 		}
 		// TODO: hard-code Malchezaar?
 		if (meta.info) {
-			// console.log('building power action', parentAction.node, parentAction, entitiesBeforeAction.get(35)?.tags?.toJS())
+			// // console.log('building power action', parentAction.node, parentAction, entitiesBeforeAction.get(35)?.tags?.toJS())
 			return meta.info
 				.map(info => this.buildPowerActions(entitiesBeforeAction, parentAction, meta, info))
 				.reduce((a, b) => a.concat(b), []);

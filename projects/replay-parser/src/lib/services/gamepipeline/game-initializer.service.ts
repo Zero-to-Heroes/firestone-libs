@@ -18,6 +18,7 @@ export class GameInitializerService {
 			.map(entity => entity as PlayerEntity);
 		let player1 = players.find(player => player.isMainPlayer);
 		let player2 = players.find(player => !player.isMainPlayer);
+		// console.debug('[game-parser] found players', player1, player2, entities.valueSeq());
 		if (!player1) {
 			const firstPlayerHand: readonly Entity[] = GameHepler.getPlayerHand(entities, players[0].playerId);
 			if (

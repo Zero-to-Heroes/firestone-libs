@@ -40,7 +40,7 @@ export class MulliganCardParser implements Parser {
 
 		// if (item instanceof HideEntityHistoryItem) {
 		// 	const owner = ActionHelper.getOwner(entitiesBeforeAction, item.entity);
-		// 	console.log('considergin', owner, item);
+		// 	// console.log('considergin', owner, item);
 		// 	if (owner instanceof PlayerEntity) {
 		// 		return [
 		// 			MulliganCardAction.create(
@@ -74,7 +74,7 @@ export class MulliganCardParser implements Parser {
 		// 	item.node.hideEntities.length > 0 &&
 		// 	GameHepler.isPlayerEntity(parseInt(item.node.attributes.entity), entitiesBeforeAction)
 		// ) {
-		// 	console.log('built mulligan action');
+		// 	// console.log('built mulligan action');
 		// 	const result = [
 		// 		MulliganCardAction.create(
 		// 			{

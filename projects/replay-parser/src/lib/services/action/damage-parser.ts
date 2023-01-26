@@ -52,7 +52,7 @@ export class DamageParser implements Parser {
 		}
 
 		if (entity.id === 641) {
-			console.log('adding damage action', item, damageTaken, previousDamageTag, entity.tags.toJS());
+			// console.log('adding damage action', item, damageTaken, previousDamageTag, entity.tags.toJS());
 		}
 		if (damageTaken > 0) {
 			return [

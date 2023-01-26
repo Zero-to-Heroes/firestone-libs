@@ -24,7 +24,7 @@ export class BaconBattleOverParser implements Parser {
 		history: readonly HistoryItem[],
 	): Action[] {
 		// TODO: add checks that we are indeed in a Battlegrounds game?
-		// console.log('visual', item.tag.value, item);
+		// // console.log('visual', item.tag.value, item);
 		if (GameHepler.getGameEntity(entitiesBeforeAction).getTag(GameTag.TECH_LEVEL_MANA_GEM) !== 1) {
 			return [];
 		}
@@ -62,7 +62,7 @@ export class BaconBattleOverParser implements Parser {
 		previousAction: BaconBattleOverAction,
 		currentAction: BaconBattleOverAction,
 	): BaconBattleOverAction {
-		// console.log(
+		// // console.log(
 		// 	'reduce 150',
 		// 	previousAction.entities.get(150) && previousAction.entities.get(150).tags.toJS(),
 		// 	previousAction,

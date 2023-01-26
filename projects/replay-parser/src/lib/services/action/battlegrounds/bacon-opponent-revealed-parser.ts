@@ -33,7 +33,7 @@ export class BaconOpponentRevealedParser implements Parser {
 			return;
 		}
 
-		// console.log('adding hero to the list of opponents', item);
+		// // console.log('adding hero to the list of opponents', item);
 		return [
 			BaconOpponentRevealedAction.create(
 				{
@@ -71,7 +71,7 @@ export class BaconOpponentRevealedParser implements Parser {
 			} as BaconOpponentRevealedAction,
 			this.allCards,
 		);
-		// console.log(
+		// // console.log(
 		// 	'reduce 150 bacoin',
 		// 	previousAction.entities.get(150) && previousAction.entities.get(150).tags.toJS(),
 		// 	result.entities.get(150) && result.entities.get(150).tags.toJS(),

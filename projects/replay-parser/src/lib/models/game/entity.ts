@@ -44,7 +44,7 @@ export class Entity {
 			(this.getTag(GameTag.COST) && this.getTag(GameTag.COST) !== -1) ||
 			// For some reasons it happens that the cost is not always set?
 			(this.getTag(GameTag.CARDTYPE) && this.getTag(GameTag.CARDTYPE) !== -1);
-		// console.log('revealed', revealed, this.id, this.cardID, this.tags.toJS());
+		// // console.log('revealed', revealed, this.id, this.cardID, this.tags.toJS());
 		return revealed;
 	}
 

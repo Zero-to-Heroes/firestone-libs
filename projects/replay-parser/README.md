@@ -18,10 +18,6 @@ After building your library with `ng build replay-parser`, go to the dist folder
 
 ## Further help
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
-
-rm -rf dist/replay-parser/ && ng build replay-parser && 'cp' -rf dist/replay-parser/ /e/Source/zerotoheroes/coliseum/node_modules/\@firestone-hs/
-
-rm -rf dist/replay-parser/ && ng build replay-parser && 'cp' -rf dist/replay-parser/ /g/Source/zerotoheroes/firestone/core/node_modules/\@firestone-hs/
+rm -rf dist/replay-parser/ && ng build replay-parser && 'cp' -rf dist/replay-parser/ /e/Source/zerotoheroes/firestone/node_modules/\@firestone-hs/
 
 rm -rf dist/replay-parser/ && ng build replay-parser --configuration production && npm publish ./dist/replay-parser --access public

@@ -1,8 +1,6 @@
 import { GameTag, MetaTags, Mulligan, Step, Zone } from '@firestone-hs/reference-data';
 import { Map } from 'immutable';
-import { Tag } from 'sax';
-// import { parser, SAXParser, Tag } from 'sax';
-import { NotForced, SaxesParser, SaxesTag } from 'saxes';
+import { SaxesParser, SaxesTagPlain } from 'saxes';
 import { ActionHistoryItem } from '../models/history/action-history-item';
 import { ChangeEntityHistoryItem } from '../models/history/change-entity-history-item';
 import { ChoicesHistoryItem } from '../models/history/choices-history-item';
@@ -52,14 +50,18 @@ export class XmlParserService {
 	public *parseXml(xmlAsString: string): IterableIterator<readonly HistoryItem[]> {
 		this.reset();
 		if (!xmlAsString) {
-			console.error('[xml-parser] no xmlAsString provided');
+			console.error('[game-parser] [xml-parser] no xmlAsString provided');
 			return null;
 		}
 
-		const testSaxes = new SaxesParser({} as NotForced);
-		testSaxes.onopentag = (tag: SaxesTag) => this.onOpenTag(tag);
-		testSaxes.onclosetag = tagName => this.onCloseTag();
-		testSaxes.onerror = error => console.error('Error while parsing xml', error);
+		// console.debug('[game-parser] [xml-parser] parsing', xmlAsString);
+		const saxesParser = new SaxesParser({
+			// fragment: true,
+		});
+		saxesParser.on('opentag', tag => this.onOpenTag(tag));
+		saxesParser.on('closetag', tag => this.onCloseTag());
+		// saxesParser.on('end', () => console.debug('parsing over'));
+		// saxesParser.on('error', error => console.error('Error while parsing xml', error));
 
 		// We want to have:
 		// - a chunk with pre-mulligan stuff, to setup the board
@@ -70,31 +72,31 @@ export class XmlParserService {
 		);
 		// We isolate the pre-mulligan stuff
 		const [setupChunk, ...gameChunks] = mulliganSplits;
-		// console.log('setupChunk', setupChunk);
+		// console.debug('[game-parser] [xml-parser] setupChunk', setupChunk, gameChunks.length);
 		// Then the other chunks are handled only on a turn-by-turn basis
 		// This logic is here to handle the case where there is no mulligan info. It should usually not happen,
 		// but I've seen it at least once
 		const gameXml = gameChunks && gameChunks.length > 0 ? gameChunks.join('') : setupChunk;
-		// console.log('gameXml', gameXml);
+		// console.log('[game-parser] [xml-parser] gameXml', gameXml);
 		// https://stackoverflow.com/questions/12001953/javascript-and-regex-split-string-and-keep-the-separator
 		const chunks = gameXml.split(
 			new RegExp(`(?=<TagChange.*tag="${GameTag.STEP}" value="${Step.MAIN_READY}".*/>)`),
 		);
-		// console.log('chunks', chunks.length);
+		// console.log('[game-parser] [xml-parser] chunks', chunks.length);
 		const splitChunks = gameChunks && gameChunks.length > 0 ? [setupChunk, ...chunks] : [...chunks];
 		for (const chunk of splitChunks) {
-			// console.log('writing chunk', chunk.length);
-			testSaxes.write(chunk);
+			// console.log('[game-parser] [xml-parser] writing chunk', chunk.length);
+			saxesParser.write(chunk);
 			yield this.history;
 			this.history = [];
 		}
-		// console.log('parsing over');
-		testSaxes.close();
+		// console.log('[game-parser] [xml-parser] parsing over');
+		saxesParser.close();
 		return null;
 	}
 
-	onOpenTag(tag: SaxesTag) {
-		this.stack.push(tag as Tag);
+	onOpenTag(tag: SaxesTagPlain) {
+		this.stack.push(tag as SaxesTagPlain);
 		if (this[`${this.state[this.state.length - 1]}State`]) {
 			this[`${this.state[this.state.length - 1]}State`](tag);
 		}
