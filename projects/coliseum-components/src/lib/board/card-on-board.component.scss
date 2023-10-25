@@ -36,6 +36,10 @@
 		top: -8%;
 	}
 
+	board-card-stats {
+		z-index: 1;
+	}
+
 	::ng-deep .card-art.card-art {
 		width: 123%;
 		// clip-path: ellipse(36% 41% at 50% 50%);
