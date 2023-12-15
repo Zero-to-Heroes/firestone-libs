@@ -8,7 +8,7 @@ export class GameEntity extends Entity {
 		// Merge tags
 		const newTags: Map<string, number> = newAttributes && newAttributes.tags ? newAttributes.tags : Map();
 		const tags: Map<string, number> = base.tags ? base.tags.merge(newTags) : newTags;
-		const newEntity: GameEntity = Object.assign(new GameEntity(), { ...base, ...newAttributes, tags });
+		const newEntity: GameEntity = Object.assign(new GameEntity(), base, newAttributes, { tags });
 		return newEntity;
 	}
 
@@ -32,7 +32,7 @@ export class GameEntity extends Entity {
 	public updateTag(tag: GameTag, value: number): GameEntity {
 		const newTags: Map<string, number> = this.tags.set(GameTag[tag], value);
 		const base: GameEntity = this;
-		return Object.assign(new GameEntity(), { ...base, tags: newTags });
+		return Object.assign(new GameEntity(), base, { tags: newTags });
 	}
 
 	public updateDamage(damage: number): GameEntity {
