@@ -30,7 +30,7 @@ export class XmlParserService {
 	private state: string[];
 	private index: number;
 	private initialTimestamp: number;
-	private history: readonly HistoryItem[];
+	private history: HistoryItem[];
 	private entityDefinition: EntityDefinition;
 	private accountHi: string;
 	private accountLo: string;
@@ -130,8 +130,8 @@ export class XmlParserService {
 				this.state.push('action');
 				break;
 			case 'ShowEntity':
-				let showEntities: readonly EntityDefinition[] = this.stack[this.stack.length - 2].showEntities || [];
-				showEntities = [...showEntities, this.entityDefinition];
+				let showEntities: EntityDefinition[] = this.stack[this.stack.length - 2].showEntities || [];
+				showEntities.push(this.entityDefinition);
 				this.stack[this.stack.length - 2].showEntities = showEntities;
 			/* falls through */
 			case 'Player':
@@ -171,8 +171,8 @@ export class XmlParserService {
 					value: parseInt(node.attributes.value),
 					parentIndex: this.stack[this.stack.length - 2].index,
 				};
-				let parentTags: readonly EntityTag[] = this.stack[this.stack.length - 2].tags || [];
-				parentTags = [...parentTags, tag];
+				let parentTags: EntityTag[] = this.stack[this.stack.length - 2].tags || [];
+				parentTags.push(tag);
 				this.stack[this.stack.length - 2].tags = parentTags;
 				const tagItem: TagChangeHistoryItem = new TagChangeHistoryItem(
 					tag,
@@ -222,14 +222,12 @@ export class XmlParserService {
 				Object.assign(this.entityDefinition, newAttributes);
 
 				if (node.name === 'ShowEntity') {
-					let showEntities: readonly EntityDefinition[] =
-						this.stack[this.stack.length - 2].showEntities || [];
-					showEntities = [...showEntities, this.entityDefinition];
+					let showEntities: EntityDefinition[] = this.stack[this.stack.length - 2].showEntities || [];
+					showEntities.push(this.entityDefinition);
 					this.stack[this.stack.length - 2].showEntities = showEntities;
 				} else if (node.name === 'FullEntity') {
-					let fullEntities: readonly EntityDefinition[] =
-						this.stack[this.stack.length - 2].fullEntities || [];
-					fullEntities = [...fullEntities, this.entityDefinition];
+					let fullEntities: EntityDefinition[] = this.stack[this.stack.length - 2].fullEntities || [];
+					fullEntities.push(this.entityDefinition);
 					this.stack[this.stack.length - 2].fullEntities = fullEntities;
 				}
 				break;
@@ -243,18 +241,6 @@ export class XmlParserService {
 				);
 				this.enqueueHistoryItem(hideEntityHistoryItem);
 				break;
-			// const hideAttributes: EntityDefinition = {
-			// 	id: parseInt(node.attributes.entity || node.attributes.id),
-			// 	index: this.index++,
-			// 	parentIndex: this.stack[this.stack.length - 2].index,
-			// 	tags: this.entityDefinition.tags, // Avoid the hassle of merging tags, just get the ones from source
-			// };
-			// Object.assign(this.entityDefinition, hideAttributes);
-
-			// let hideEntities: readonly number[] = this.stack[this.stack.length - 2].hideEntities || [];
-			// hideEntities = [...hideEntities, this.entityDefinition.id];
-			// this.stack[this.stack.length - 2].hideEntities = hideEntities;
-			// break;
 			case 'TagChange':
 				const tag: EntityTag = {
 					index: this.index++,
@@ -263,8 +249,8 @@ export class XmlParserService {
 					value: parseInt(node.attributes.value),
 					parentIndex: this.stack[this.stack.length - 2].index,
 				};
-				let parentTags: readonly EntityTag[] = this.stack[this.stack.length - 2].tags || [];
-				parentTags = [...parentTags, tag];
+				let parentTags: EntityTag[] = this.stack[this.stack.length - 2].tags || [];
+				parentTags.push(tag);
 				this.stack[this.stack.length - 2].tags = parentTags;
 				const tagItem: TagChangeHistoryItem = new TagChangeHistoryItem(
 					tag,
@@ -288,8 +274,8 @@ export class XmlParserService {
 					node.index,
 				);
 				this.enqueueHistoryItem(metaItem);
-				let parentMeta: readonly MetaData[] = this.stack[this.stack.length - 2].meta || [];
-				parentMeta = [...parentMeta, this.metaData];
+				let parentMeta: MetaData[] = this.stack[this.stack.length - 2].meta || [];
+				parentMeta.push(this.metaData);
 				this.stack[this.stack.length - 2].meta = parentMeta;
 				this.state.push('metaData');
 				break;
@@ -352,8 +338,8 @@ export class XmlParserService {
 					entity: parseInt(node.attributes.id || node.attributes.entity),
 					parent: this.metaData,
 				};
-				let infos: readonly Info[] = this.metaData.info;
-				infos = [...infos, info];
+				let infos: Info[] = this.metaData.info;
+				infos.push(info);
 				Object.assign(this.metaData, { info: infos });
 				break;
 		}
@@ -370,8 +356,8 @@ export class XmlParserService {
 		node.index = this.index++;
 		switch (node.name) {
 			case 'Choice':
-				let cards: readonly number[] = this.chosen.cards;
-				cards = [...cards, parseInt(node.attributes.entity)];
+				let cards: number[] = this.chosen.cards;
+				cards.push(parseInt(node.attributes.entity));
 				Object.assign(this.chosen, { cards });
 		}
 	}
@@ -401,8 +387,8 @@ export class XmlParserService {
 					parentIndex: this.stack[this.stack.length - 2].index,
 					index: this.index++,
 				};
-				let options: readonly Option[] = this.stack[this.stack.length - 2].options || [];
-				options = [...options, option];
+				let options: Option[] = this.stack[this.stack.length - 2].options || [];
+				options.push(option);
 				this.stack[this.stack.length - 2].options = options;
 		}
 	}
@@ -498,7 +484,7 @@ export class XmlParserService {
 		switch (node.name) {
 			case 'Choice':
 				let cards = this.choices.cards || [];
-				cards = [...cards, parseInt(node.attributes.entity)];
+				cards.push(parseInt(node.attributes.entity));
 				Object.assign(this.choices, { cards });
 		}
 	}
@@ -527,7 +513,7 @@ export class XmlParserService {
 			console.error("History item doesn't have timestamp", item);
 			throw new Error("History item doesn't have timestamp" + item);
 		}
-		this.history = [...(this.history || []), item];
+		this.history.push(item);
 	}
 
 	private reset() {

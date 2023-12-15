@@ -6,5 +6,5 @@ export interface MetaData {
 	readonly parentIndex: number;
 	readonly ts: number;
 	readonly index: number;
-	readonly info: readonly Info[];
+	readonly info: Info[];
 }

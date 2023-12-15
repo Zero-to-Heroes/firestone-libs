@@ -6,11 +6,11 @@ import { Option } from './option';
 
 export interface EnrichedTag extends SaxesTagPlain {
 	index?: number;
-	showEntities?: readonly EntityDefinition[];
-	fullEntities?: readonly EntityDefinition[];
+	showEntities?: EntityDefinition[];
+	fullEntities?: EntityDefinition[];
 	// hideEntities?: readonly number[];
-	tags?: readonly EntityTag[];
-	options?: readonly Option[];
-	meta?: readonly MetaData[];
+	tags?: EntityTag[];
+	options?: Option[];
+	meta?: MetaData[];
 	parentIndex?: number;
 }

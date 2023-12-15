@@ -31,7 +31,7 @@ export class DiscoverParser implements Parser {
 					index: item.index,
 					originId: item.choices.source,
 					ownerId: item.choices.playerID,
-					choices: item.choices.cards,
+					choices: item.choices.cards as readonly number[],
 				} as DiscoverAction,
 				this.allCards,
 			),
