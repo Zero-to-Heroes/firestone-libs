@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { CardType, GameTag } from '@firestone-hs/reference-data';
 import { Map } from 'immutable';
 import { Action } from '../../models/action/action';
 import { Entity } from '../../models/game/entity';
@@ -81,51 +82,25 @@ export class ActionParserService {
 		config: ActionParserConfig = new ActionParserConfig(),
 		debug = false,
 	): Game {
-		// const start = Date.now();
 		// Because mulligan is effectively index -1; since there is a 0 turn after that
-		let currentTurn = game.turns.size - 1;
-		// // console.log('current turn at start', currentTurn);
-		let actionsForTurn: readonly Action[] = [];
+		const currentTurn = game.turns.size - 1;
 		let previousStateEntities: Map<number, Entity> = entities;
 		let previousProcessedItem: HistoryItem = history[0];
-		// let turns: Map<number, Turn> = game.turns;
+		let actionsForTurn: readonly Action[] = [];
 		// Recreating this every time lets the parsers store state and emit the action only when necessary
 		const actionParsers: Parser[] = this.registerActionParsers(config);
-
-		// let turnStart = Date.now();
-		// let parserDurationForTurn = 0;
 		for (const item of history) {
-			// const start = Date.now();
 			const entitiesBeforeAction = previousStateEntities;
 			previousStateEntities = this.stateProcessorService.applyHistoryItem(previousStateEntities, item);
-			//if (debug) {
-			//	// console.log('is entity present', entitiesBeforeAction.has(35), previousStateEntities.has(35), previousStateEntities.get(35)?.tags?.toJS());
-			//}
 			previousProcessedItem = item;
-			actionParsers.forEach(parser => {
-				if (parser.applies(item)) {
-					// const start = Date.now();
-					// When we perform an action, we want to show the result of the state updates until the next action is
-					// played.
-					// // console.log('parser might apply', parser, item);
-					const actions: Action[] = parser.parse(
-						item,
-						currentTurn,
-						entitiesBeforeAction,
-						history,
-						game.players,
-					);
-					if (actions && actions.length > 0) {
-						// // console.log('parser applies', parser, item, actions);
-						actionsForTurn = this.sortActions(
-							actionsForTurn,
-							(a: Action, b: Action) => a.index - b.index || a.timestamp - b.timestamp,
-						);
-						actionsForTurn = this.fillMissingEntities(actionsForTurn, entitiesBeforeAction);
-						actionsForTurn = [...actionsForTurn, ...actions];
-					}
-				}
-			});
+			actionsForTurn = this.updateActionsForTurn(
+				item,
+				actionsForTurn,
+				actionParsers,
+				entitiesBeforeAction,
+				history,
+				game,
+			);
 		}
 
 		previousStateEntities = this.stateProcessorService.applyHistoryUntilEnd(
@@ -133,10 +108,6 @@ export class ActionParserService {
 			history,
 			previousProcessedItem,
 		);
-		// // console.log(
-		// 	'after history applied until end 35',
-		// 	previousStateEntities.get(35) && previousStateEntities.get(35).tags.toJS(),
-		// );
 		// Sort actions based on their index (so that actions that were created from the same
 		// parent action can have a custom order)
 		actionsForTurn = this.sortActions(
@@ -144,39 +115,11 @@ export class ActionParserService {
 			(a: Action, b: Action) => a.index - b.index || a.timestamp - b.timestamp,
 		);
 		actionsForTurn = this.fillMissingEntities(actionsForTurn, previousStateEntities);
-		// // console.log('actionsForTurn after fillMissingEntities', actionsForTurn);
-		// // console.log(
-		// 	'after sortActions 150',
-		// 	actionsForTurn[actionsForTurn.length - 1].entities.get(150) &&
-		// 		actionsForTurn[actionsForTurn.length - 1].entities.get(150).tags.toJS(),
-		// );
-		// // console.log('actionsForTurn after sortActions', actionsForTurn[actionsForTurn.length - 1].entities.toJS());
-		// if (debug) {
-		// 	// console.log('is entity present after sort', actionsForTurn[actionsForTurn.length - 1].entities.has(507));
-		// }
 		// Give an opportunity to each parser to combine the actions it produced by merging them
 		// For instance, if we two card draws in a row, we might want to display them as a single
 		// action that draws two cards
 		actionsForTurn = this.reduceActions(actionParsers, actionsForTurn);
-		// // console.log(
-		// 	'after reduceActions 150',
-		// 	actionsForTurn[actionsForTurn.length - 1].entities.get(150) &&
-		// 		actionsForTurn[actionsForTurn.length - 1].entities.get(150).tags.toJS(),
-		// );
-		// // console.log('actionsForTurn after reduceActions', actionsForTurn[actionsForTurn.length - 1].entities.toJS());
 		actionsForTurn = this.addDamageToEntities(actionsForTurn, previousStateEntities);
-		// // console.log(
-		// 	'after addDamageToEntities 150',
-		// 	actionsForTurn[actionsForTurn.length - 1].entities.get(150) &&
-		// 		actionsForTurn[actionsForTurn.length - 1].entities.get(150).tags.toJS(),
-		// );
-		// // console.log(
-		// 	'actionsForTurn after addDamageToEntities',
-		// 	actionsForTurn[actionsForTurn.length - 1].entities.toJS(),
-		// );
-		// if (debug) {
-		// 	// console.log('is entity present after damage', actionsForTurn[actionsForTurn.length - 1].entities.has(507));
-		// }
 		try {
 			if (currentTurn < 0) {
 				// // console.log('handling game init entity updates');
@@ -198,6 +141,33 @@ export class ActionParserService {
 			return game;
 		}
 		// this.logger.log('took', Date.now() - start, 'ms for parseActions');
+	}
+
+	private updateActionsForTurn(
+		item: HistoryItem,
+		actionsForTurn: readonly Action[],
+		actionParsers: Parser[],
+		entitiesBeforeAction: Map<number, Entity>,
+		history: readonly HistoryItem[],
+		game: Game,
+	): readonly Action[] {
+		const currentTurn = game.turns.size - 1;
+		actionParsers.forEach(parser => {
+			if (parser.applies(item)) {
+				// When we perform an action, we want to show the result of the state updates until the next action is
+				// played.
+				const actions: Action[] = parser.parse(item, currentTurn, entitiesBeforeAction, history, game.players);
+				if (actions && actions.length > 0) {
+					actionsForTurn = this.sortActions(
+						actionsForTurn,
+						(a: Action, b: Action) => a.index - b.index || a.timestamp - b.timestamp,
+					);
+					actionsForTurn = this.fillMissingEntities(actionsForTurn, entitiesBeforeAction);
+					actionsForTurn = [...actionsForTurn, ...actions];
+				}
+			}
+		});
+		return actionsForTurn;
 	}
 
 	private fillMissingEntities(
@@ -241,6 +211,14 @@ export class ActionParserService {
 	}
 
 	private updateDamageForEntity(action: Action, entity: Entity): Entity {
+		if (
+			!action.damages ||
+			[CardType.SPELL, CardType.ENCHANTMENT, CardType.BATTLEGROUND_QUEST_REWARD, CardType.HERO_POWER].includes(
+				entity.getTag(GameTag.CARDTYPE),
+			)
+		) {
+			return entity;
+		}
 		const damages: Map<number, number> = action.damages;
 		const damage = damages.get(entity.id);
 		return entity.updateDamage(damage);

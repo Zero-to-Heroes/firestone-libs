@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CardType, GameTag, GameType } from '@firestone-hs/reference-data';
+import { CardType, GameTag, GameType, Zone } from '@firestone-hs/reference-data';
 import { Map } from 'immutable';
 import { Entity } from '../../models/game/entity';
 import { GameEntity } from '../../models/game/game-entity';
@@ -26,8 +26,10 @@ export class GamePopulationService {
 		entityCardIdMapping: Map<number, string>,
 	): Map<number, Entity> {
 		// Map of entityId - entity definition
-
-		const entities: Map<number, Entity> = game.getLatestParsedState();
+		// TODO: should we remove here all the SETASIDE / REMOVEDFROMGAME entities?
+		const entities: Map<number, Entity> = game.getLatestParsedState()
+			.filter((entity: Entity) => ![Zone.REMOVEDFROMGAME].includes(entity.getTag(GameTag.ZONE)));
+		console.debug('entities reduced from', game.getLatestParsedState().size, 'to', entities.size);
 		const entitiesAfterInit: Map<number, Entity> = this.initializeEntities(history, entities);
 		const entitiesAfterFillingCardIds: Map<number, Entity> = this.addMissingCardIds(
 			entitiesAfterInit,
@@ -172,16 +174,16 @@ export class GamePopulationService {
 		// 	// // console.log('enriching', item);
 		// }
 		if (item.tag.tag === GameTag.SECRET && item.tag.value === 1) {
-			const entity: Entity = entities.get(item.tag.entity).update({ tags: Map({ [GameTag[item.tag.tag]]: 1 }) });
-			return entities.set(entity.id, entity);
+			const entity: Entity = entities.get(item.tag.entity)?.update({ tags: Map({ [GameTag[item.tag.tag]]: 1 }) });
+			return !!entity ? entities.set(entity.id, entity) : entities;
 		} else if (item.tag.tag === GameTag.QUEST && item.tag.value === 1) {
-			const entity: Entity = entities.get(item.tag.entity).update({ tags: Map({ [GameTag[item.tag.tag]]: 1 }) });
-			return entities.set(entity.id, entity);
+			const entity: Entity = entities.get(item.tag.entity)?.update({ tags: Map({ [GameTag[item.tag.tag]]: 1 }) });
+			return !!entity ? entities.set(entity.id, entity) : entities;
 		} else if (item.tag.tag === GameTag.PARENT_CARD) {
 			const entity: Entity = entities
 				.get(item.tag.entity)
-				.update({ tags: Map({ [GameTag[item.tag.tag]]: item.tag.value }) });
-			return entities.set(entity.id, entity);
+				?.update({ tags: Map({ [GameTag[item.tag.tag]]: item.tag.value }) });
+			return !!entity ? entities.set(entity.id, entity) : entities;
 		}
 		return entities;
 	}
