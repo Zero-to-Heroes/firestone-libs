@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, ViewRef } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, ViewRef } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { CardType, GameTag } from '@firestone-hs/reference-data';
 import { AllCardsService, Entity } from '@firestone-hs/replay-parser';
@@ -7,47 +7,37 @@ import { AllCardsService, Entity } from '@firestone-hs/replay-parser';
 	selector: 'card-text',
 	styleUrls: ['../global/text.scss', './card-text.component.scss'],
 	template: `
-		<div class="card-text {{ _cardType }}" [ngClass]="{ 'premium': premium }" *ngIf="text">
-			<div
-				class="text"
-				[fittext]="true"
-				[minFontSize]="2"
-				[useMaxFontSize]="true"
-				[activateOnResize]="false"
-				[modelToWatch]="dirtyFlag"
-				[innerHTML]="text"
-			></div>
+		<div class="card-text {{ _cardType }}" [ngClass]="{ premium: premium }" *ngIf="text">
+			<div class="text" [innerHTML]="text"></div>
 		</div>
 	`,
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CardTextComponent {
-	_cardType: string;
+	_cardType: string | null;
 	premium: boolean;
-	text: SafeHtml;
-	maxFontSize: number;
-	dirtyFlag = false;
+	text: SafeHtml | undefined;
 
-	private _entity: Entity;
-	private _controller: Entity;
+	private _entity: Entity | undefined;
+	private _controller: Entity | undefined;
 
 	constructor(
 		private cards: AllCardsService,
 		private domSanitizer: DomSanitizer,
-		
 		private cdr: ChangeDetectorRef,
+		private el: ElementRef,
 	) {
-		document.addEventListener('card-resize', event => this.resizeText());
+		document.addEventListener('card-resize', (event) => this.resizeText(), true);
 	}
 
-	@Input('entity') set entity(value: Entity) {
-		// console.log('[card-text] setting entity', value.tags.toJS());
+	@Input() set entity(value: Entity) {
+		// console.debug('[card-text] setting entity', value.tags.toJS());
 		this._entity = value;
 		this.updateText();
 	}
 
-	@Input('controller') set controller(value: Entity) {
-		// console.log('[card-text] setting controller', value && value.tags.toJS());
+	@Input() set controller(value: Entity | undefined) {
+		// console.debug('[card-text] setting controller', value && value.tags.toJS());
 		this._controller = value;
 		this.updateText();
 	}
@@ -56,12 +46,11 @@ export class CardTextComponent {
 		if (!this._entity) {
 			return;
 		}
-		// console.log('updating text')
 		const cardId = this._entity.cardID;
 		this.text = undefined;
 		const originalCard = this.cards.getCard(cardId);
 		if (!originalCard.text) {
-			if (!(this.cdr as ViewRef)?.destroyed) {
+			if (!(this.cdr as ViewRef).destroyed) {
 				this.cdr.detectChanges();
 			}
 			return;
@@ -80,9 +69,11 @@ export class CardTextComponent {
 		// Damage placeholder, influenced by spell damage
 		let damageBonus = 0;
 		let doubleDamage = 0;
+		// console.log('building text for', description);
 		if (this._controller) {
 			if (this._entity.getCardType() === CardType.SPELL) {
 				damageBonus = this._controller.getTag(GameTag.CURRENT_SPELLPOWER) || 0;
+				// console.log('damage bonus', damageBonus);
 				if (this._entity.getTag(GameTag.RECEIVES_DOUBLE_SPELLDAMAGE_BONUS) === 1) {
 					damageBonus *= 2;
 				}
@@ -97,25 +88,31 @@ export class CardTextComponent {
 			// Now replace the value, if relevant
 			.replace('@', `${this._entity.getTag(GameTag.TAG_SCRIPT_DATA_NUM_1)}`)
 			.replace(/\$(\d+)/g, this.modifier(damageBonus, doubleDamage))
-			.replace(/\#(\d+)/g, this.modifier(damageBonus, doubleDamage));
+			.replace(/#(\d+)/g, this.modifier(damageBonus, doubleDamage));
+		// console.log('updated', description, damageBonus, doubleDamage, this._controller, this._entity);
 		this.text = this.domSanitizer.bypassSecurityTrustHtml(description);
-		// console.log('updated text', this.text)
 
 		// Text is not the same color for premium cards
 		this.premium = this._entity.getTag(GameTag.PREMIUM) === 1;
-		this.resizeText();
-		setTimeout(() => this.resizeText(), 100);
+
+		if (!(this.cdr as ViewRef).destroyed) {
+			this.cdr.detectChanges();
+		}
 	}
 
-	@Input('cardType') set cardType(cardType: CardType) {
-		// console.log('[card-text] setting cardType', cardType);
-		this._cardType = CardType[cardType]?.toLowerCase();
+	@Input() set cardType(cardType: CardType | undefined) {
+		// console.debug('[card-text] setting cardType', cardType);
+		this._cardType = !cardType ? null : CardType[cardType]?.toLowerCase();
 	}
 
 	private resizeText() {
-		this.dirtyFlag = !this.dirtyFlag;
-		// console.log('asking for text resize')
-		if (!(this.cdr as ViewRef)?.destroyed) {
+		const textSize = this.text?.toString().length || 0;
+		const textSizeRatio = 13 / textSize;
+		const element = this.el.nativeElement.querySelector('.text');
+		const fontSize = textSizeRatio * element.clientWidth;
+		element.style.fontSize = `${fontSize}px`;
+		console.debug('resizeText', fontSize);
+		if (!(this.cdr as ViewRef).destroyed) {
 			this.cdr.detectChanges();
 		}
 	}
@@ -126,7 +123,6 @@ export class CardTextComponent {
 			if (bonus !== 0 || double !== 0) {
 				value += bonus;
 				value *= Math.pow(2, double);
-				// console.log('updated value', value);
 				return '*' + value + '*';
 			}
 			return '' + value;

@@ -29,7 +29,7 @@ export class GamePopulationService {
 		// TODO: should we remove here all the SETASIDE / REMOVEDFROMGAME entities?
 		const entities: Map<number, Entity> = game.getLatestParsedState()
 			.filter((entity: Entity) => ![Zone.REMOVEDFROMGAME].includes(entity.getTag(GameTag.ZONE)));
-		console.debug('entities reduced from', game.getLatestParsedState().size, 'to', entities.size);
+		// console.debug('entities reduced from', game.getLatestParsedState().size, 'to', entities.size);
 		const entitiesAfterInit: Map<number, Entity> = this.initializeEntities(history, entities);
 		const entitiesAfterFillingCardIds: Map<number, Entity> = this.addMissingCardIds(
 			entitiesAfterInit,
