@@ -238,6 +238,7 @@ export class BattlegroundsSimulationParserService {
 		playerEntity: PlayerEntity,
 		damages: Map<number, number>,
 	): Entity {
+		const refCard = this.allCards.getCard(boardEntity.cardId);
 		const tags: Map<string, number> = Map({
 			[GameTag[GameTag.CONTROLLER]]: playerEntity.playerId,
 			[GameTag[GameTag.CARDTYPE]]: CardType.MINION,
@@ -247,10 +248,12 @@ export class BattlegroundsSimulationParserService {
 			[GameTag[GameTag.HEALTH]]: boardEntity.maxHealth ?? boardEntity.health,
 			[GameTag[GameTag.DAMAGE]]:( boardEntity.maxHealth ?? boardEntity.health) - boardEntity.health,
 			[GameTag[GameTag.TAUNT]]: boardEntity.taunt ? 1 : 0,
-			[GameTag[GameTag.POISONOUS]]: boardEntity.poisonous ? 1 : 0,
+			[GameTag[GameTag.POISONOUS]]: boardEntity.poisonous ||boardEntity.venomous ? 1 : 0,
 			[GameTag[GameTag.DIVINE_SHIELD]]: boardEntity.divineShield ? 1 : 0,
 			[GameTag[GameTag.REBORN]]: boardEntity.reborn ? 1 : 0,
-			[GameTag[GameTag.WINDFURY]]: boardEntity.windfury || boardEntity.megaWindfury ? 1 : 0,
+			[GameTag[GameTag.WINDFURY]]: boardEntity.windfury ? 1 : 0,
+			[GameTag[GameTag.DEATHRATTLE]]: refCard.mechanics?.includes(GameTag[GameTag.DEATHRATTLE]) ? 1 : 0,
+			[GameTag[GameTag.TRIGGER_VISUAL]]: refCard.mechanics?.includes(GameTag[GameTag.TRIGGER_VISUAL]) ? 1 : 0,
 			[GameTag[GameTag.PREMIUM]]: this.allCards.getCard(boardEntity.cardId).battlegroundsNormalDbfId ? 1 : 0,
 		});
 		return Entity.create({
