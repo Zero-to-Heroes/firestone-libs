@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CardType, GameTag, GameType, Zone } from '@firestone-hs/reference-data';
 import { BoardEntity } from '@firestone-hs/simulate-bgs-battle/dist/board-entity';
+import { BoardSecret } from '@firestone-hs/simulate-bgs-battle/dist/board-secret';
 import { Damage, GameAction } from '@firestone-hs/simulate-bgs-battle/dist/simulation/spectator/game-action';
 import { GameSample } from '@firestone-hs/simulate-bgs-battle/dist/simulation/spectator/game-sample';
 import { Map } from 'immutable';
@@ -226,6 +227,10 @@ export class BattlegroundsSimulationParserService {
 					Zone.HAND
 				)
 			);
+		const playerSecretEntities: readonly Entity[] = (action.playerSecrets || [])
+			.map((entity, index) => this.buildSecretEntity(entity, index, playerEntity, damages));
+		const opponentSecretEntities: readonly Entity[] = (action.opponentSecrets || [])
+			.map((entity, index) => this.buildSecretEntity(entity, index, opponentEntity, damages));
 			
 		// // console.log('split entities', friendlyEntities, opponentEntities);
 		const allEntities: readonly Entity[] = [
@@ -239,6 +244,8 @@ export class BattlegroundsSimulationParserService {
 			...opponentBoardEntities,
 			...friendlyHandEntities,
 			...opponentHandEntities,
+			...playerSecretEntities,
+			...opponentSecretEntities,
 		];
 		const mapEntries: readonly [number, Entity][] = allEntities.map(entity => [entity.id, entity]);
 		// // console.log('map entries', mapEntries);
@@ -284,6 +291,29 @@ export class BattlegroundsSimulationParserService {
 			[GameTag[GameTag.DEATHRATTLE]]: refCard.mechanics?.includes(GameTag[GameTag.DEATHRATTLE]) ? 1 : 0,
 			[GameTag[GameTag.TRIGGER_VISUAL]]: refCard.mechanics?.includes(GameTag[GameTag.TRIGGER_VISUAL]) ? 1 : 0,
 			[GameTag[GameTag.PREMIUM]]: this.allCards.getCard(boardEntity.cardId).battlegroundsNormalDbfId ? 1 : 0,
+		});
+		return Entity.create({
+			id: boardEntity.entityId,
+			cardID: boardEntity.cardId,
+			tags: tags,
+			damageForThisAction:
+				damages && damages.get(boardEntity.entityId) ? damages.get(boardEntity.entityId) : undefined,
+		} as Entity);
+	}
+
+	private buildSecretEntity(
+		boardEntity: BoardSecret,
+		boardPosition: number,
+		playerEntity: PlayerEntity,
+		damages: Map<number, number>,
+	): Entity {
+		const refCard = this.allCards.getCard(boardEntity.cardId);
+		const tags: Map<string, number> = Map({
+			[GameTag[GameTag.CONTROLLER]]: playerEntity.playerId,
+			[GameTag[GameTag.CARDTYPE]]: CardType.SPELL,
+			[GameTag[GameTag.ZONE]]: Zone.SECRET,
+			[GameTag[GameTag.CLASS]]: GameTag[refCard.classes?.[0].toUpperCase() ?? 'NEUTRAL'],
+			[GameTag[GameTag.ZONE_POSITION]]: boardPosition,
 		});
 		return Entity.create({
 			id: boardEntity.entityId,
