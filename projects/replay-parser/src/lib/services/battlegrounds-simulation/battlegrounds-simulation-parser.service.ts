@@ -222,7 +222,7 @@ export class BattlegroundsSimulationParserService {
 				this.buildEntity(
 					entity,
 					index,
-					playerEntity,
+					opponentEntity,
 					damages,
 					Zone.HAND
 				)
