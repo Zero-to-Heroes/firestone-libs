@@ -1,6 +1,6 @@
 {
 	"name": "@firestone-hs/replay-parser",
-	"version": "1.2.17",
+	"version": "1.2.18",
 	"main": "bundles/firestone-replay-parser.umd.js",
 	"module": "fesm5/firestone-replay-parser.js",
 	"es2015": "fesm2015/firestone-replay-parser.js",

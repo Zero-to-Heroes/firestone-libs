@@ -180,7 +180,7 @@ export class BattlegroundsSimulationParserService {
 			...(action.deaths || []),
 		];
 		// // console.log('parsing action', action.type, allSourceEntities, action);
-		const friendlyEntities: readonly Entity[] = allSourceEntities
+		const friendlyBoardEntities: readonly Entity[] = allSourceEntities
 			.filter(entity => entity.friendly)
 			.map((boardEntity, index) =>
 				this.buildEntity(
@@ -190,7 +190,7 @@ export class BattlegroundsSimulationParserService {
 					damages,
 				),
 			);
-		const opponentEntities: readonly Entity[] = allSourceEntities
+		const opponentBoardEntities: readonly Entity[] = allSourceEntities
 			.filter(entity => !entity.friendly)
 			.map((boardEntity, index) =>
 				this.buildEntity(
@@ -199,6 +199,32 @@ export class BattlegroundsSimulationParserService {
 					opponentEntity,
 					damages,
 				),
+			);
+		const allHandEntities = [
+			...(action.playerHand || []),
+			...(action.opponentHand || []),
+		]
+		const friendlyHandEntities: readonly Entity[] = allHandEntities
+			.filter(entity => entity.friendly)
+			.map((entity, index) => 
+				this.buildEntity(
+					entity,
+					index,
+					playerEntity,
+					damages,
+					Zone.HAND
+				)
+			);
+		const opponentHandEntities: readonly Entity[] = allHandEntities
+			.filter(entity => !entity.friendly)
+			.map((entity, index) => 
+				this.buildEntity(
+					entity,
+					index,
+					playerEntity,
+					damages,
+					Zone.HAND
+				)
 			);
 			
 		// // console.log('split entities', friendlyEntities, opponentEntities);
@@ -209,8 +235,10 @@ export class BattlegroundsSimulationParserService {
 			Object.assign(new PlayerEntity(), opponentEntity, { 
 				damageForThisAction: damages && damages.get(opponentEntity.id) ? damages.get(opponentEntity.id) : undefined 
 			} as PlayerEntity), 
-			...friendlyEntities, 
-			...opponentEntities
+			...friendlyBoardEntities, 
+			...opponentBoardEntities,
+			...friendlyHandEntities,
+			...opponentHandEntities,
 		];
 		const mapEntries: readonly [number, Entity][] = allEntities.map(entity => [entity.id, entity]);
 		// // console.log('map entries', mapEntries);
@@ -237,12 +265,13 @@ export class BattlegroundsSimulationParserService {
 		boardPosition: number,
 		playerEntity: PlayerEntity,
 		damages: Map<number, number>,
+		zone = Zone.PLAY
 	): Entity {
 		const refCard = this.allCards.getCard(boardEntity.cardId);
 		const tags: Map<string, number> = Map({
 			[GameTag[GameTag.CONTROLLER]]: playerEntity.playerId,
 			[GameTag[GameTag.CARDTYPE]]: CardType.MINION,
-			[GameTag[GameTag.ZONE]]: Zone.PLAY,
+			[GameTag[GameTag.ZONE]]: zone ?? Zone.PLAY,
 			[GameTag[GameTag.ZONE_POSITION]]: boardPosition,
 			[GameTag[GameTag.ATK]]: boardEntity.attack,
 			[GameTag[GameTag.HEALTH]]: boardEntity.maxHealth ?? boardEntity.health,
