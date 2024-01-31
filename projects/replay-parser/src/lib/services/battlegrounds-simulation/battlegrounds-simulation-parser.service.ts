@@ -291,6 +291,7 @@ export class BattlegroundsSimulationParserService {
 			[GameTag[GameTag.DEATHRATTLE]]: refCard.mechanics?.includes(GameTag[GameTag.DEATHRATTLE]) ? 1 : 0,
 			[GameTag[GameTag.TRIGGER_VISUAL]]: refCard.mechanics?.includes(GameTag[GameTag.TRIGGER_VISUAL]) ? 1 : 0,
 			[GameTag[GameTag.PREMIUM]]: this.allCards.getCard(boardEntity.cardId).battlegroundsNormalDbfId ? 1 : 0,
+			[GameTag[GameTag.TECH_LEVEL]]: this.allCards.getCard(boardEntity.cardId).techLevel,
 		});
 		return Entity.create({
 			id: boardEntity.entityId,
