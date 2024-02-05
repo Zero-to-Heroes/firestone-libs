@@ -13,7 +13,7 @@ export class GameHelper {
 	}
 
 	public static getGameEntity(entities: Map<number, Entity>): Entity {
-		return entities ? entities.toArray().find(entity => entity instanceof GameEntity) : null;
+		return entities ? entities.valueSeq().find(entity => entity instanceof GameEntity) : null;
 	}
 
 	public static getTavernButton(entities: Map<number, Entity>, controllerId: number, slotPosition: number): Entity {
@@ -22,7 +22,7 @@ export class GameHelper {
 			entities &&
 			gameEntity.getTag(GameTag.TECH_LEVEL_MANA_GEM) &&
 			entities
-				.toArray()
+				.valueSeq()
 				.find(
 					entity =>
 						entity.getZone() === Zone.PLAY &&

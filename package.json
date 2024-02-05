@@ -26,7 +26,6 @@
 		"big-integer": "^1.6.48",
 		"cross-fetch": "^3.0.4",
 		"elementtree": "^0.1.7",
-		"ng2-fittext": "^1.2.8",
 		"node-fetch": "^2.6.0",
 		"rxjs": "^7.5.0",
 		"saxes": "^6.0.0",

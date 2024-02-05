@@ -167,7 +167,7 @@ export class HeroComponent {
 			return null;
 		}
 		const heroPower = entities
-			.toArray()
+			.valueSeq()
 			.filter(entity => entity.getTag(GameTag.CARDTYPE) === CardType.HERO_POWER)
 			.filter(entity => entity.getTag(GameTag.ZONE) === Zone.PLAY)
 			.filter(entity => entity.getTag(GameTag.CONTROLLER) === playerId)[0];
@@ -179,7 +179,7 @@ export class HeroComponent {
 			return null;
 		}
 		return entities
-			.toArray()
+			.valueSeq()
 			.filter(entity => entity.getTag(GameTag.CARDTYPE) === CardType.WEAPON)
 			.filter(entity => entity.getTag(GameTag.ZONE) === Zone.PLAY)
 			.filter(entity => entity.getTag(GameTag.CONTROLLER) === playerId)[0];
@@ -190,9 +190,10 @@ export class HeroComponent {
 			return null;
 		}
 		return entities
-			.toArray()
+			.valueSeq()
 			.filter(entity => entity.getTag(GameTag.CONTROLLER) === playerId)
 			.filter(entity => entity.getTag(GameTag.ZONE) === Zone.SECRET)
-			.sort((a, b) => a.getTag(GameTag.ZONE_POSITION) - b.getTag(GameTag.ZONE_POSITION));
+			.sort((a, b) => a.getTag(GameTag.ZONE_POSITION) - b.getTag(GameTag.ZONE_POSITION))
+			.toArray();
 	}
 }
