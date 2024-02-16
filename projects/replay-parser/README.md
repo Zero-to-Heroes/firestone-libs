@@ -19,6 +19,5 @@ After building your library with `ng build replay-parser`, go to the dist folder
 ## Further help
 
 rm -rf dist/replay-parser/ && ng build replay-parser && 'cp' -rf dist/replay-parser/ /e/Source/zerotoheroes/firestone/node_modules/\@firestone-hs/
-rm -rf dist/replay-parser/ && ng build replay-parser && 'cp' -rf dist/replay-parser/ /e/Source/zerotoheroes/coliseum/node_modules/\@firestone-hs/
 
 rm -rf dist/replay-parser/ && ng build replay-parser --configuration production && npm publish ./dist/replay-parser --access public
