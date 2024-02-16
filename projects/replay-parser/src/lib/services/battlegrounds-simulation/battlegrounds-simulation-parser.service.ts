@@ -53,7 +53,7 @@ export class BattlegroundsSimulationParserService {
 		const playerHeroPowerEntity: Entity = this.buildPlayerHeroPowerEntity(bgsSimulationWithIds, playerEntity);
 		const opponentHeroPowerEntity: Entity = this.buildOpponentHeroPowerEntity(bgsSimulationWithIds, opponentEntity);
 		const playerRewardEntity: Entity = this.buildPlayerRewardEntity(bgsSimulationWithIds, playerEntity);
-		const opponentRewardEntity: Entity = this.buildOpponentRewardEntity(bgsSimulationWithIds, playerEntity);
+		const opponentRewardEntity: Entity = this.buildOpponentRewardEntity(bgsSimulationWithIds, opponentEntity);
 		let game: Game = Game.createGame({
 			players: [playerEntity, opponentEntity] as readonly PlayerEntity[],
 			turns: Map.of(
