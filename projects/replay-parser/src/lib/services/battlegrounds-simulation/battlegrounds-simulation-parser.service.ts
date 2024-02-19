@@ -42,18 +42,14 @@ export class BattlegroundsSimulationParserService {
 			...bgsSimulation,
 			playerEntityId: 100000001,
 			playerHeroPowerEntityId: 100000002,
-			playerRewardEntityId: 100000003,
 			opponentEntityId: 200000001,
 			opponentHeroPowerEntityId: 200000002,
-			opponentRewardEntityId: 200000003,
 		};
 
 		const playerEntity: PlayerEntity = this.buildPlayerEntity(bgsSimulationWithIds);
 		const opponentEntity: PlayerEntity = this.buildOpponentEntity(bgsSimulationWithIds);
 		const playerHeroPowerEntity: Entity = this.buildPlayerHeroPowerEntity(bgsSimulationWithIds, playerEntity);
 		const opponentHeroPowerEntity: Entity = this.buildOpponentHeroPowerEntity(bgsSimulationWithIds, opponentEntity);
-		const playerRewardEntity: Entity = this.buildPlayerRewardEntity(bgsSimulationWithIds, playerEntity);
-		const opponentRewardEntity: Entity = this.buildOpponentRewardEntity(bgsSimulationWithIds, opponentEntity);
 		let game: Game = Game.createGame({
 			players: [playerEntity, opponentEntity] as readonly PlayerEntity[],
 			turns: Map.of(
@@ -64,8 +60,6 @@ export class BattlegroundsSimulationParserService {
 					opponentEntity,
 					playerHeroPowerEntity,
 					opponentHeroPowerEntity,
-					playerRewardEntity,
-					opponentRewardEntity,
 				),
 			),
 			gameType: GameType.GT_BATTLEGROUNDS,
@@ -82,8 +76,6 @@ export class BattlegroundsSimulationParserService {
 		opponentEntity: PlayerEntity,
 		playerHeroPowerEntity: Entity,
 		opponentHeroPowerEntity: Entity,
-		playerRewardEntity: Entity,
-		opponentRewardEntity: Entity,
 	): Turn {
 		return ActionTurn.create({
 			turn: 'battle',
@@ -95,8 +87,6 @@ export class BattlegroundsSimulationParserService {
 					opponentEntity,
 					playerHeroPowerEntity,
 					opponentHeroPowerEntity,
-					playerRewardEntity,
-					opponentRewardEntity,
 				),
 			),
 		} as any as ActionTurn);
@@ -108,10 +98,10 @@ export class BattlegroundsSimulationParserService {
 		opponentEntity: PlayerEntity,
 		playerHeroPowerEntity: Entity,
 		opponentHeroPowerEntity: Entity,
-		playerRewardEntity: Entity,
-		opponentRewardEntity: Entity,
 	): Action {
 		const damages = this.buildDamages(action.type, action.damages, playerEntity, opponentEntity);
+		const playerRewardEntity: Entity = this.buildPlayerRewardEntity(action, playerEntity);
+		const opponentRewardEntity: Entity = this.buildOpponentRewardEntity(action, opponentEntity);
 		if (action.type === 'start-of-combat') {
 			const result = StartTurnAction.create(
 				{
@@ -482,8 +472,8 @@ export class BattlegroundsSimulationParserService {
 		} as Entity);
 	}
 
-	private buildPlayerRewardEntity(bgsSimulation: ExtendedGameSample, playerEntity: PlayerEntity): Entity {
-		if (!bgsSimulation.playerRewardCardId) {
+	private buildPlayerRewardEntity(action: GameAction, playerEntity: PlayerEntity): Entity {
+		if (!action.playerRewardCardId) {
 			return null;
 		}
 
@@ -492,17 +482,17 @@ export class BattlegroundsSimulationParserService {
 			[GameTag[GameTag.CARDTYPE]]: CardType.BATTLEGROUND_QUEST_REWARD,
 			[GameTag[GameTag.ZONE]]: Zone.PLAY,
 			[GameTag[GameTag.ENTITY_ID]]: Zone.PLAY,
-			[GameTag[GameTag.TAG_SCRIPT_DATA_NUM_1]]: bgsSimulation.playerRewardData,
+			[GameTag[GameTag.TAG_SCRIPT_DATA_NUM_1]]: action.playerRewardData,
 		});
 		return Entity.create({
-			id: bgsSimulation.playerRewardEntityId,
-			cardID: bgsSimulation.playerRewardCardId,
+			id: action.playerRewardEntityId,
+			cardID: action.playerRewardCardId,
 			tags: tags,
 		} as Entity);
 	}
 
-	private buildOpponentRewardEntity(bgsSimulation: ExtendedGameSample, playerEntity: PlayerEntity): Entity {
-		if (!bgsSimulation.opponentRewardCardId) {
+	private buildOpponentRewardEntity(action: GameAction, playerEntity: PlayerEntity): Entity {
+		if (!action.opponentRewardCardId) {
 			return null;
 		}
 
@@ -511,11 +501,11 @@ export class BattlegroundsSimulationParserService {
 			[GameTag[GameTag.CARDTYPE]]: CardType.BATTLEGROUND_QUEST_REWARD,
 			[GameTag[GameTag.ZONE]]: Zone.PLAY,
 			[GameTag[GameTag.ENTITY_ID]]: Zone.PLAY,
-			[GameTag[GameTag.TAG_SCRIPT_DATA_NUM_1]]: bgsSimulation.opponentRewardData,
+			[GameTag[GameTag.TAG_SCRIPT_DATA_NUM_1]]: action.opponentRewardData,
 		});
 		return Entity.create({
-			id: bgsSimulation.opponentRewardEntityId,
-			cardID: bgsSimulation.opponentRewardCardId,
+			id: action.opponentRewardEntityId,
+			cardID: action.opponentRewardCardId,
 			tags: tags,
 		} as Entity);
 	}
