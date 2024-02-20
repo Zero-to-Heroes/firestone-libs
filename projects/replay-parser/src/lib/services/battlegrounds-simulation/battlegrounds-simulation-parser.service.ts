@@ -409,6 +409,7 @@ export class BattlegroundsSimulationParserService {
 			[GameTag[GameTag.WINDFURY]]: boardEntity.windfury ? 1 : 0,
 			[GameTag[GameTag.DEATHRATTLE]]: refCard.mechanics?.includes(GameTag[GameTag.DEATHRATTLE]) ? 1 : 0,
 			[GameTag[GameTag.TRIGGER_VISUAL]]: refCard.mechanics?.includes(GameTag[GameTag.TRIGGER_VISUAL]) ? 1 : 0,
+			[GameTag[GameTag.STEALTH]]: boardEntity.stealth ? 1 : 0,
 			[GameTag[GameTag.PREMIUM]]: this.allCards.getCard(boardEntity.cardId).battlegroundsNormalDbfId ? 1 : 0,
 			[GameTag[GameTag.TECH_LEVEL]]: this.allCards.getCard(boardEntity.cardId).techLevel,
 		});
