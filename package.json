@@ -20,7 +20,7 @@
 		"@angular/platform-browser": "^15.0.1",
 		"@angular/platform-browser-dynamic": "^15.0.1",
 		"@angular/router": "^15.0.1",
-		"@firestone-hs/reference-data": "^1.0.36",
+		"@firestone-hs/reference-data": "^2.0.23",
 		"@firestone-hs/replay-parser": "^1.2.3",
 		"@firestone-hs/simulate-bgs-battle": "^1.1.381",
 		"big-integer": "^1.6.48",

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CardType, GameTag, GameType, Zone } from '@firestone-hs/reference-data';
+import { CardType, GameTag, Zone, isBattlegrounds } from '@firestone-hs/reference-data';
 import { Map } from 'immutable';
 import { Entity } from '../../models/game/entity';
 import { GameEntity } from '../../models/game/game-entity';
@@ -27,7 +27,8 @@ export class GamePopulationService {
 	): Map<number, Entity> {
 		// Map of entityId - entity definition
 		// TODO: should we remove here all the SETASIDE / REMOVEDFROMGAME entities?
-		const entities: Map<number, Entity> = game.getLatestParsedState()
+		const entities: Map<number, Entity> = game
+			.getLatestParsedState()
 			.filter((entity: Entity) => ![Zone.REMOVEDFROMGAME].includes(entity.getTag(GameTag.ZONE)));
 		// console.debug('entities reduced from', game.getLatestParsedState().size, 'to', entities.size);
 		const entitiesAfterInit: Map<number, Entity> = this.initializeEntities(history, entities);
@@ -106,7 +107,7 @@ export class GamePopulationService {
 		});
 		let entity: GameEntity = GameEntity.create(base).update(historyItem.entityDefintion);
 		// Battlegrounds doesn't have the right board state set at start
-		if (historyItem.gameType === GameType.GT_BATTLEGROUNDS) {
+		if (isBattlegrounds(historyItem.gameType)) {
 			// // console.log('initializing game entity with visual state', entity.tags.toJS(), entity);
 			entity = entity.updateTag(GameTag.BOARD_VISUAL_STATE, 1);
 			// // console.log('updated', entity.tags.toJS(), entity);
