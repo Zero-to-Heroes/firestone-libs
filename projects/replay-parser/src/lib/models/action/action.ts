@@ -9,6 +9,9 @@ export abstract class Action {
 	readonly index: number;
 	readonly textRaw: string;
 
+	readonly playerId?: number;
+	readonly opponentId?: number;
+
 	// Since we want to make actions more compact and show everything at once, we store
 	// this data in possibly any action
 	readonly originId: number;
@@ -48,13 +51,13 @@ export abstract class Action {
 		}
 		const originCardId = ActionHelper.getCardId(this.entities, this.originId, allEntitiesSoFar);
 		const originCardName = this.allCards.getCard(originCardId).name;
-		const targetCardIds = this.targetIds.map(entityId =>
+		const targetCardIds = this.targetIds.map((entityId) =>
 			ActionHelper.getCardId(this.entities, entityId, allEntitiesSoFar),
 		);
-		const cardIds = targetCardIds.map(cardId => this.allCards.getCard(cardId));
-		const targetCardNames = cardIds.some(card => !card || !card.name)
+		const cardIds = targetCardIds.map((cardId) => this.allCards.getCard(cardId));
+		const targetCardNames = cardIds.some((card) => !card || !card.name)
 			? `${cardIds.length} cards`
-			: cardIds.map(card => card.name).join(', ');
+			: cardIds.map((card) => card.name).join(', ');
 		let damageText = '';
 		if (this.damages) {
 			damageText = this.damages

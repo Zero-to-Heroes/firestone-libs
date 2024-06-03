@@ -31,7 +31,7 @@ export class StateProcessorService {
 		GameTag.CREATOR,
 		GameTag.CURRENT_HEROPOWER_DAMAGE_BONUS,
 		GameTag.CURRENT_PLAYER,
-		GameTag.CURRENT_SPELLPOWER,
+		GameTag.CURRENT_SPELLPOWER_BASE,
 		GameTag.DAMAGE,
 		GameTag.DEATHRATTLE,
 		GameTag.DIVINE_SHIELD,

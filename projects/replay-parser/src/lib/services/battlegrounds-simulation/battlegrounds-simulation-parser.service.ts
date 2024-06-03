@@ -40,10 +40,16 @@ export class BattlegroundsSimulationParserService {
 		await this.allCards.initializeCardsDb();
 		const bgsSimulationWithIds: ExtendedGameSample = {
 			...bgsSimulation,
-			playerEntityId: 100000001,
+			playerEntityId: bgsSimulation.actions[0].playerEntityId,
 			playerHeroPowerEntityId: 100000002,
-			opponentEntityId: 200000001,
+			playerCardId: bgsSimulation.actions[0].playerCardId,
+			playerHeroPowerCardId: bgsSimulation.actions[0].playerHeroPowerCardId,
+			playerHeroPowerUsed: bgsSimulation.actions[0].playerHeroPowerUsed,
+			opponentEntityId: bgsSimulation.actions[0].opponentEntityId,
 			opponentHeroPowerEntityId: 200000002,
+			opponentCardId: bgsSimulation.actions[0].opponentCardId,
+			opponentHeroPowerCardId: bgsSimulation.actions[0].opponentHeroPowerCardId,
+			opponentHeroPowerUsed: bgsSimulation.actions[0].opponentHeroPowerUsed,
 		};
 
 		const playerEntity: PlayerEntity = this.buildPlayerEntity(bgsSimulationWithIds);
@@ -66,7 +72,7 @@ export class BattlegroundsSimulationParserService {
 		} as Game);
 		game = this.narrator.populateActionTextForLastTurn(game);
 		game = this.narrator.createGameStoryForLastTurn(game);
-		// // console.log('built game', game, game.turns.toJS());
+		// console.log('built game', game, game.turns.toJS(), 'from', bgsSimulationWithIds);
 		return game;
 	}
 
@@ -105,16 +111,9 @@ export class BattlegroundsSimulationParserService {
 		if (action.type === 'start-of-combat') {
 			const result = StartTurnAction.create(
 				{
-					entities: this.buildEntities(
-						action,
-						playerEntity,
-						opponentEntity,
-						playerHeroPowerEntity,
-						opponentHeroPowerEntity,
-						playerRewardEntity,
-						opponentRewardEntity,
-						damages,
-					),
+					playerId: action.playerEntityId,
+					opponentId: action.opponentEntityId,
+					entities: this.buildEntities(action, playerRewardEntity, opponentRewardEntity, damages),
 				} as StartTurnAction,
 				this.allCards,
 			);
@@ -123,16 +122,9 @@ export class BattlegroundsSimulationParserService {
 		} else if (action.type === 'player-attack') {
 			const result = AttackAction.create(
 				{
-					entities: this.buildEntities(
-						action,
-						playerEntity,
-						opponentEntity,
-						playerHeroPowerEntity,
-						opponentHeroPowerEntity,
-						playerRewardEntity,
-						opponentRewardEntity,
-						damages,
-					),
+					playerId: action.playerEntityId,
+					opponentId: action.opponentEntityId,
+					entities: this.buildEntities(action, playerRewardEntity, opponentRewardEntity, damages),
 					originId: playerEntity.id,
 					targetId: opponentEntity.id,
 					targets: [[playerEntity.id, opponentEntity.id]] as readonly number[][],
@@ -145,16 +137,9 @@ export class BattlegroundsSimulationParserService {
 		} else if (action.type === 'opponent-attack') {
 			const result = AttackAction.create(
 				{
-					entities: this.buildEntities(
-						action,
-						playerEntity,
-						opponentEntity,
-						playerHeroPowerEntity,
-						opponentHeroPowerEntity,
-						playerRewardEntity,
-						opponentRewardEntity,
-						damages,
-					),
+					playerId: action.playerEntityId,
+					opponentId: action.opponentEntityId,
+					entities: this.buildEntities(action, playerRewardEntity, opponentRewardEntity, damages),
 					originId: opponentEntity.id,
 					targetId: playerEntity.id,
 					targets: [[opponentEntity.id, playerEntity.id]] as readonly number[][],
@@ -167,16 +152,9 @@ export class BattlegroundsSimulationParserService {
 		} else if (action.type === 'attack') {
 			const result = AttackAction.create(
 				{
-					entities: this.buildEntities(
-						action,
-						playerEntity,
-						opponentEntity,
-						playerHeroPowerEntity,
-						opponentHeroPowerEntity,
-						playerRewardEntity,
-						opponentRewardEntity,
-						damages,
-					),
+					playerId: action.playerEntityId,
+					opponentId: action.opponentEntityId,
+					entities: this.buildEntities(action, playerRewardEntity, opponentRewardEntity, damages),
 					originId: action.sourceEntityId,
 					targetId: action.targetEntityId,
 					targets: [[action.sourceEntityId, action.targetEntityId]] as readonly number[][],
@@ -189,16 +167,9 @@ export class BattlegroundsSimulationParserService {
 		} else if (action.type === 'damage') {
 			return DamageAction.create(
 				{
-					entities: this.buildEntities(
-						action,
-						playerEntity,
-						opponentEntity,
-						playerHeroPowerEntity,
-						opponentHeroPowerEntity,
-						playerRewardEntity,
-						opponentRewardEntity,
-						damages,
-					),
+					playerId: action.playerEntityId,
+					opponentId: action.opponentEntityId,
+					entities: this.buildEntities(action, playerRewardEntity, opponentRewardEntity, damages),
 					damages: damages,
 				} as DamageAction,
 				this.allCards,
@@ -208,16 +179,9 @@ export class BattlegroundsSimulationParserService {
 			const targetIds: readonly number[] = action.targetEntityIds ?? [action.targetEntityId];
 			return PowerTargetAction.create(
 				{
-					entities: this.buildEntities(
-						action,
-						playerEntity,
-						opponentEntity,
-						playerHeroPowerEntity,
-						opponentHeroPowerEntity,
-						playerRewardEntity,
-						opponentRewardEntity,
-						damages,
-					),
+					playerId: action.playerEntityId,
+					opponentId: action.opponentEntityId,
+					entities: this.buildEntities(action, playerRewardEntity, opponentRewardEntity, damages),
 					originId: action.sourceEntityId,
 					targetIds: targetIds,
 					targets: targetIds.map((targetId) => [action.sourceEntityId, targetId]) as readonly [
@@ -230,17 +194,10 @@ export class BattlegroundsSimulationParserService {
 		} else if (action.type === 'spawn') {
 			return SummonAction.create(
 				{
+					playerId: action.playerEntityId,
+					opponentId: action.opponentEntityId,
 					originId: action.sourceEntityId,
-					entities: this.buildEntities(
-						action,
-						playerEntity,
-						opponentEntity,
-						playerHeroPowerEntity,
-						opponentHeroPowerEntity,
-						playerRewardEntity,
-						opponentRewardEntity,
-						null,
-					),
+					entities: this.buildEntities(action, playerRewardEntity, opponentRewardEntity, null),
 					entityIds: action.spawns.map((entity) => entity.entityId) as readonly number[],
 				} as SummonAction,
 				this.allCards,
@@ -248,16 +205,9 @@ export class BattlegroundsSimulationParserService {
 		} else if (action.type === 'minion-death') {
 			return MinionDeathAction.create(
 				{
-					entities: this.buildEntities(
-						action,
-						playerEntity,
-						opponentEntity,
-						playerHeroPowerEntity,
-						opponentHeroPowerEntity,
-						playerRewardEntity,
-						opponentRewardEntity,
-						null,
-					),
+					playerId: action.playerEntityId,
+					opponentId: action.opponentEntityId,
+					entities: this.buildEntities(action, playerRewardEntity, opponentRewardEntity, null),
 					deadMinions: action.deaths.map((entity) => entity.entityId) as readonly number[],
 				} as MinionDeathAction,
 				this.allCards,
@@ -297,14 +247,34 @@ export class BattlegroundsSimulationParserService {
 
 	private buildEntities(
 		action: GameAction,
-		playerEntity: PlayerEntity,
-		opponentEntity: PlayerEntity,
-		playerHeroPowerEntity: Entity,
-		opponentHeroPowerEntity: Entity,
 		playerRewardEntity: Entity,
 		opponentRewardEntity: Entity,
 		damages: Map<number, number>,
 	): Map<number, Entity> {
+		const playerEntity = this.buildGenericPlayerEntity(
+			'Player',
+			action.playerEntityId,
+			action.playerEntityId,
+			action.playerCardId,
+		);
+		const opponentEntity = this.buildGenericPlayerEntity(
+			'Opponent',
+			action.opponentEntityId,
+			action.opponentEntityId,
+			action.opponentCardId,
+		);
+		const playerHeroPowerEntity = this.buildGenericHeroPowerEntity(
+			action.playerHeroPowerCardId,
+			action.playerHeroPowerEntityId,
+			action.playerHeroPowerUsed,
+			playerEntity.playerId,
+		);
+		const opponentHeroPowerEntity = this.buildGenericHeroPowerEntity(
+			action.opponentHeroPowerCardId,
+			action.opponentHeroPowerEntityId,
+			action.opponentHeroPowerUsed,
+			opponentEntity.playerId,
+		);
 		const allSourceEntities = [
 			...(action.playerBoard || []),
 			...(action.opponentBoard || []),
@@ -448,27 +418,36 @@ export class BattlegroundsSimulationParserService {
 	private buildPlayerEntity(bgsSimulation: ExtendedGameSample): PlayerEntity {
 		return this.buildGenericPlayerEntity(
 			'Player',
-			bgsSimulation.playerEntityId - 1,
+			bgsSimulation.playerEntityId,
 			bgsSimulation.playerEntityId,
 			bgsSimulation.playerCardId,
 		);
 	}
 
 	private buildPlayerHeroPowerEntity(bgsSimulation: ExtendedGameSample, playerEntity: PlayerEntity): Entity {
-		if (!bgsSimulation.playerHeroPowerCardId) {
+		return this.buildGenericHeroPowerEntity(
+			bgsSimulation.playerHeroPowerCardId,
+			bgsSimulation.playerHeroPowerEntityId,
+			bgsSimulation.playerHeroPowerUsed,
+			playerEntity.playerId,
+		);
+	}
+
+	private buildGenericHeroPowerEntity(cardId: string, entityId: number, used: boolean, playerId: number): Entity {
+		if (!cardId) {
 			return null;
 		}
 
 		const tags: Map<string, number> = Map({
-			[GameTag[GameTag.CONTROLLER]]: playerEntity.playerId,
+			[GameTag[GameTag.CONTROLLER]]: playerId,
 			[GameTag[GameTag.CARDTYPE]]: CardType.HERO_POWER,
 			[GameTag[GameTag.ZONE]]: Zone.PLAY,
 			[GameTag[GameTag.ENTITY_ID]]: Zone.PLAY,
-			[GameTag[GameTag.EXHAUSTED]]: bgsSimulation.playerHeroPowerUsed ? 1 : 0,
+			[GameTag[GameTag.EXHAUSTED]]: used ? 1 : 0,
 		});
 		return Entity.create({
-			id: bgsSimulation.playerHeroPowerEntityId,
-			cardID: bgsSimulation.playerHeroPowerCardId,
+			id: entityId,
+			cardID: cardId,
 			tags: tags,
 		} as Entity);
 	}
@@ -512,28 +491,18 @@ export class BattlegroundsSimulationParserService {
 	}
 
 	private buildOpponentHeroPowerEntity(bgsSimulation: ExtendedGameSample, playerEntity: PlayerEntity): Entity {
-		if (!bgsSimulation.opponentHeroPowerCardId) {
-			return null;
-		}
-
-		const tags: Map<string, number> = Map({
-			[GameTag[GameTag.CONTROLLER]]: playerEntity.playerId,
-			[GameTag[GameTag.CARDTYPE]]: CardType.HERO_POWER,
-			[GameTag[GameTag.ZONE]]: Zone.PLAY,
-			[GameTag[GameTag.ENTITY_ID]]: Zone.PLAY,
-			[GameTag[GameTag.EXHAUSTED]]: bgsSimulation.opponentHeroPowerUsed ? 1 : 0,
-		});
-		return Entity.create({
-			id: bgsSimulation.opponentHeroPowerEntityId,
-			cardID: bgsSimulation.opponentHeroPowerCardId,
-			tags: tags,
-		} as Entity);
+		return this.buildGenericHeroPowerEntity(
+			bgsSimulation.opponentHeroPowerCardId,
+			bgsSimulation.opponentHeroPowerEntityId,
+			bgsSimulation.opponentHeroPowerUsed,
+			playerEntity.playerId,
+		);
 	}
 
 	private buildOpponentEntity(bgsSimulation: ExtendedGameSample): PlayerEntity {
 		return this.buildGenericPlayerEntity(
 			'Opponent',
-			bgsSimulation.opponentEntityId - 1,
+			bgsSimulation.opponentEntityId,
 			bgsSimulation.opponentEntityId,
 			bgsSimulation.opponentCardId,
 		);
