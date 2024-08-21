@@ -315,6 +315,12 @@ export class BattlegroundsSimulationParserService {
 		const opponentSecretEntities: readonly Entity[] = (action.opponentSecrets || []).map((entity, index) =>
 			this.buildSecretEntity(entity, index, opponentEntity, damages),
 		);
+		const playerTrinketEntities: readonly Entity[] = (action.playerTrinkets || []).map((entity, index) =>
+			this.buildTrinketEntity(entity, playerEntity, index),
+		);
+		const opponentTrinketEntities: readonly Entity[] = (action.opponentTrinkets || []).map((entity, index) =>
+			this.buildTrinketEntity(entity, opponentEntity, index),
+		);
 
 		// // console.log('split entities', friendlyEntities, opponentEntities);
 		const allEntities: readonly Entity[] = [
@@ -335,6 +341,8 @@ export class BattlegroundsSimulationParserService {
 			...opponentHandEntities,
 			...playerSecretEntities,
 			...opponentSecretEntities,
+			...playerTrinketEntities,
+			...opponentTrinketEntities,
 		].filter((e) => !!e);
 		const mapEntries: readonly [number, Entity][] = allEntities.map((entity) => [entity.id, entity]);
 		// // console.log('map entries', mapEntries);
@@ -412,6 +420,21 @@ export class BattlegroundsSimulationParserService {
 			tags: tags,
 			damageForThisAction:
 				damages && damages.get(boardEntity.entityId) ? damages.get(boardEntity.entityId) : undefined,
+		} as Entity);
+	}
+
+	private buildTrinketEntity(boardEntity: BoardSecret, playerEntity: PlayerEntity, index: number): Entity {
+		const refCard = this.allCards.getCard(boardEntity.cardId);
+		const tags: Map<string, number> = Map({
+			[GameTag[GameTag.CONTROLLER]]: playerEntity.playerId,
+			[GameTag[GameTag.CARDTYPE]]: CardType.BATTLEGROUND_TRINKET,
+			[GameTag[GameTag.ZONE]]: Zone.PLAY,
+			[GameTag[GameTag.TAG_SCRIPT_DATA_NUM_6]]: index + 1,
+		});
+		return Entity.create({
+			id: boardEntity.entityId,
+			cardID: boardEntity.cardId,
+			tags: tags,
 		} as Entity);
 	}
 
