@@ -13,7 +13,7 @@ import { GameHelper } from '../services/game-helper';
 			<hero-card [hero]="_hero" [playerEntity]="playerEntity" [secrets]="_secrets" [option]="isOption(_hero)">
 			</hero-card>
 			<hero-power [heroPower]="_heroPower" [option]="isOption(_heroPower)"></hero-power>
-			<tavern-level-icon *ngIf="tavernLevel > 0" [level]="tavernLevel"></tavern-level-icon>
+			<old-tavern-level-icon *ngIf="tavernLevel > 0" [level]="tavernLevel"></old-tavern-level-icon>
 			<tavern-button
 				class="tavern-upgrade"
 				*ngIf="tavernUpgradeEntity"
@@ -110,7 +110,7 @@ export class HeroComponent {
 
 	private updateEntityGroups() {
 		this.playerEntity =
-			this._entities && this._entities.find(entity => entity.getTag(GameTag.PLAYER_ID) === this._playerId);
+			this._entities && this._entities.find((entity) => entity.getTag(GameTag.PLAYER_ID) === this._playerId);
 		this._hero = this.getHeroEntity(this._entities, this.playerEntity);
 		// console.log('hero', this._hero, this._hero && this._hero.cardID, this._hero && this._hero.tags.toJS());
 		this._heroPower = this.getHeroPowerEntity(this._entities, this._playerId);
@@ -119,7 +119,7 @@ export class HeroComponent {
 
 		// Battlegrounds stuff
 		const opponentEntity =
-			this._entities && this._entities.find(entity => entity.getTag(GameTag.PLAYER_ID) === this._opponentId);
+			this._entities && this._entities.find((entity) => entity.getTag(GameTag.PLAYER_ID) === this._opponentId);
 		this.tavernLevel =
 			opponentEntity &&
 			this._hero &&
@@ -168,9 +168,9 @@ export class HeroComponent {
 		}
 		const heroPower = entities
 			.valueSeq()
-			.filter(entity => entity.getTag(GameTag.CARDTYPE) === CardType.HERO_POWER)
-			.filter(entity => entity.getTag(GameTag.ZONE) === Zone.PLAY)
-			.filter(entity => entity.getTag(GameTag.CONTROLLER) === playerId)[0];
+			.filter((entity) => entity.getTag(GameTag.CARDTYPE) === CardType.HERO_POWER)
+			.filter((entity) => entity.getTag(GameTag.ZONE) === Zone.PLAY)
+			.filter((entity) => entity.getTag(GameTag.CONTROLLER) === playerId)[0];
 		return heroPower;
 	}
 
@@ -180,9 +180,9 @@ export class HeroComponent {
 		}
 		return entities
 			.valueSeq()
-			.filter(entity => entity.getTag(GameTag.CARDTYPE) === CardType.WEAPON)
-			.filter(entity => entity.getTag(GameTag.ZONE) === Zone.PLAY)
-			.filter(entity => entity.getTag(GameTag.CONTROLLER) === playerId)[0];
+			.filter((entity) => entity.getTag(GameTag.CARDTYPE) === CardType.WEAPON)
+			.filter((entity) => entity.getTag(GameTag.ZONE) === Zone.PLAY)
+			.filter((entity) => entity.getTag(GameTag.CONTROLLER) === playerId)[0];
 	}
 
 	private getSecretEntities(entities: Map<number, Entity>, playerId: number): readonly Entity[] {
@@ -191,8 +191,8 @@ export class HeroComponent {
 		}
 		return entities
 			.valueSeq()
-			.filter(entity => entity.getTag(GameTag.CONTROLLER) === playerId)
-			.filter(entity => entity.getTag(GameTag.ZONE) === Zone.SECRET)
+			.filter((entity) => entity.getTag(GameTag.CONTROLLER) === playerId)
+			.filter((entity) => entity.getTag(GameTag.ZONE) === Zone.SECRET)
 			.sort((a, b) => a.getTag(GameTag.ZONE_POSITION) - b.getTag(GameTag.ZONE_POSITION))
 			.toArray();
 	}

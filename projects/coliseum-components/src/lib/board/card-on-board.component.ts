@@ -29,10 +29,10 @@ import { AllCardsService, Entity } from '@firestone-hs/replay-parser';
 			<sleeping *ngIf="sleeping"></sleeping>
 			<power-indicator [entity]="_entity"></power-indicator>
 			<card-on-board-overlays [entity]="_entity"></card-on-board-overlays>
-			<tavern-level-icon
+			<old-tavern-level-icon
 				*ngIf="!isMainPlayer && tavernTier > 0 && isRecruitPhase"
 				[level]="tavernTier"
-			></tavern-level-icon>
+			></old-tavern-level-icon>
 		</div>
 	`,
 	changeDetection: ChangeDetectionStrategy.OnPush,
