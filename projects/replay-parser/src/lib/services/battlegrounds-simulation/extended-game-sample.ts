@@ -14,4 +14,6 @@ export class ExtendedGameSample implements GameSample {
 	readonly playerHeroPowerEntityId: number;
 	readonly opponentEntityId: number;
 	readonly opponentHeroPowerEntityId: number;
+
+	readonly anomalies: readonly string[];
 }

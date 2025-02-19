@@ -87,13 +87,7 @@ export class BattlegroundsSimulationParserService {
 			turn: 'battle',
 			activePlayer: undefined,
 			actions: bgsSimulation.actions.map((action) =>
-				this.buildGameAction(
-					action,
-					playerEntity,
-					opponentEntity,
-					playerHeroPowerEntity,
-					opponentHeroPowerEntity,
-				),
+				this.buildGameAction(action, playerEntity, opponentEntity, bgsSimulation.anomalies),
 			),
 		} as any as ActionTurn);
 	}
@@ -102,8 +96,7 @@ export class BattlegroundsSimulationParserService {
 		action: GameAction,
 		playerEntity: PlayerEntity,
 		opponentEntity: PlayerEntity,
-		playerHeroPowerEntity: Entity,
-		opponentHeroPowerEntity: Entity,
+		anomalies: readonly string[],
 	): Action {
 		const damages = this.buildDamages(action.type, action.damages, playerEntity, opponentEntity);
 		const playerRewardEntity: Entity = this.buildPlayerRewardEntity(action, playerEntity);
@@ -113,7 +106,7 @@ export class BattlegroundsSimulationParserService {
 				{
 					playerId: action.playerEntityId,
 					opponentId: action.opponentEntityId,
-					entities: this.buildEntities(action, playerRewardEntity, opponentRewardEntity, damages),
+					entities: this.buildEntities(action, playerRewardEntity, opponentRewardEntity, anomalies, damages),
 				} as StartTurnAction,
 				this.allCards,
 			);
@@ -124,7 +117,7 @@ export class BattlegroundsSimulationParserService {
 				{
 					playerId: action.playerEntityId,
 					opponentId: action.opponentEntityId,
-					entities: this.buildEntities(action, playerRewardEntity, opponentRewardEntity, damages),
+					entities: this.buildEntities(action, playerRewardEntity, opponentRewardEntity, anomalies, damages),
 					originId: playerEntity.id,
 					targetId: opponentEntity.id,
 					targets: [[playerEntity.id, opponentEntity.id]] as readonly number[][],
@@ -139,7 +132,7 @@ export class BattlegroundsSimulationParserService {
 				{
 					playerId: action.playerEntityId,
 					opponentId: action.opponentEntityId,
-					entities: this.buildEntities(action, playerRewardEntity, opponentRewardEntity, damages),
+					entities: this.buildEntities(action, playerRewardEntity, opponentRewardEntity, anomalies, damages),
 					originId: opponentEntity.id,
 					targetId: playerEntity.id,
 					targets: [[opponentEntity.id, playerEntity.id]] as readonly number[][],
@@ -154,7 +147,7 @@ export class BattlegroundsSimulationParserService {
 				{
 					playerId: action.playerEntityId,
 					opponentId: action.opponentEntityId,
-					entities: this.buildEntities(action, playerRewardEntity, opponentRewardEntity, damages),
+					entities: this.buildEntities(action, playerRewardEntity, opponentRewardEntity, anomalies, damages),
 					originId: action.sourceEntityId,
 					targetId: action.targetEntityId,
 					targets: [[action.sourceEntityId, action.targetEntityId]] as readonly number[][],
@@ -169,7 +162,7 @@ export class BattlegroundsSimulationParserService {
 				{
 					playerId: action.playerEntityId,
 					opponentId: action.opponentEntityId,
-					entities: this.buildEntities(action, playerRewardEntity, opponentRewardEntity, damages),
+					entities: this.buildEntities(action, playerRewardEntity, opponentRewardEntity, anomalies, damages),
 					damages: damages,
 				} as DamageAction,
 				this.allCards,
@@ -181,7 +174,7 @@ export class BattlegroundsSimulationParserService {
 				{
 					playerId: action.playerEntityId,
 					opponentId: action.opponentEntityId,
-					entities: this.buildEntities(action, playerRewardEntity, opponentRewardEntity, damages),
+					entities: this.buildEntities(action, playerRewardEntity, opponentRewardEntity, anomalies, damages),
 					originId: action.sourceEntityId,
 					targetIds: targetIds,
 					targets: targetIds.map((targetId) => [action.sourceEntityId, targetId]) as readonly [
@@ -197,7 +190,7 @@ export class BattlegroundsSimulationParserService {
 					playerId: action.playerEntityId,
 					opponentId: action.opponentEntityId,
 					originId: action.sourceEntityId,
-					entities: this.buildEntities(action, playerRewardEntity, opponentRewardEntity, null),
+					entities: this.buildEntities(action, playerRewardEntity, opponentRewardEntity, anomalies, null),
 					entityIds: action.spawns.map((entity) => entity.entityId) as readonly number[],
 				} as SummonAction,
 				this.allCards,
@@ -207,7 +200,7 @@ export class BattlegroundsSimulationParserService {
 				{
 					playerId: action.playerEntityId,
 					opponentId: action.opponentEntityId,
-					entities: this.buildEntities(action, playerRewardEntity, opponentRewardEntity, null),
+					entities: this.buildEntities(action, playerRewardEntity, opponentRewardEntity, anomalies, null),
 					deadMinions: action.deaths.map((entity) => entity.entityId) as readonly number[],
 				} as MinionDeathAction,
 				this.allCards,
@@ -249,6 +242,7 @@ export class BattlegroundsSimulationParserService {
 		action: GameAction,
 		playerRewardEntity: Entity,
 		opponentRewardEntity: Entity,
+		anomalies: readonly string[],
 		damages: Map<number, number>,
 	): Map<number, Entity> {
 		const playerEntity = this.buildGenericPlayerEntity(
@@ -275,6 +269,7 @@ export class BattlegroundsSimulationParserService {
 			action.opponentHeroPowerUsed,
 			opponentEntity.playerId,
 		);
+		const anomalyEntities = (anomalies ?? []).map((anomaly) => this.buildAnomalyEntity(anomaly));
 		const allSourceEntities = [
 			...(action.playerBoard || []),
 			...(action.opponentBoard || []),
@@ -335,6 +330,7 @@ export class BattlegroundsSimulationParserService {
 			opponentHeroPowerEntity,
 			playerRewardEntity,
 			opponentRewardEntity,
+			...anomalyEntities,
 			...friendlyBoardEntities,
 			...opponentBoardEntities,
 			...friendlyHandEntities,
@@ -470,6 +466,23 @@ export class BattlegroundsSimulationParserService {
 		});
 		return Entity.create({
 			id: entityId,
+			cardID: cardId,
+			tags: tags,
+		} as Entity);
+	}
+
+	private buildAnomalyEntity(cardId: string): Entity {
+		if (!cardId) {
+			return null;
+		}
+
+		const tags: Map<string, number> = Map({
+			[GameTag[GameTag.CARDTYPE]]: CardType.BATTLEGROUND_ANOMALY,
+			[GameTag[GameTag.ZONE]]: Zone.PLAY,
+			[GameTag[GameTag.ENTITY_ID]]: Zone.PLAY,
+		});
+		return Entity.create({
+			id: 6666666661,
 			cardID: cardId,
 			tags: tags,
 		} as Entity);
