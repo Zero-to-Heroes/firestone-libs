@@ -489,7 +489,10 @@ export class BattlegroundsSimulationParserService {
 	}
 
 	private buildPlayerRewardEntity(action: GameAction, playerEntity: PlayerEntity): Entity {
-		if (!action.playerRewardCardId) {
+		const cardId = action.playerRewardCardId ?? action.playerHeroPowers?.[1]?.cardId;
+		const entityId = action.playerRewardEntityId ?? action.playerHeroPowers?.[1]?.entityId;
+		console.debug('player quest reward card id', cardId);
+		if (!cardId) {
 			return null;
 		}
 
@@ -497,18 +500,21 @@ export class BattlegroundsSimulationParserService {
 			[GameTag[GameTag.CONTROLLER]]: playerEntity.playerId,
 			[GameTag[GameTag.CARDTYPE]]: CardType.BATTLEGROUND_QUEST_REWARD,
 			[GameTag[GameTag.ZONE]]: Zone.PLAY,
-			[GameTag[GameTag.ENTITY_ID]]: Zone.PLAY,
+			[GameTag[GameTag.ENTITY_ID]]: entityId,
 			[GameTag[GameTag.TAG_SCRIPT_DATA_NUM_1]]: action.playerRewardData,
 		});
+		console.debug('player quest reward tags', tags.toJS());
 		return Entity.create({
-			id: action.playerRewardEntityId,
-			cardID: action.playerRewardCardId,
+			id: entityId,
+			cardID: cardId,
 			tags: tags,
 		} as Entity);
 	}
 
 	private buildOpponentRewardEntity(action: GameAction, playerEntity: PlayerEntity): Entity {
-		if (!action.opponentRewardCardId) {
+		const cardId = action.opponentRewardCardId ?? action.opponentHeroPowers?.[1]?.cardId;
+		const entityId = action.opponentRewardEntityId ?? action.opponentHeroPowers?.[1]?.entityId;
+		if (!cardId) {
 			return null;
 		}
 
@@ -516,12 +522,12 @@ export class BattlegroundsSimulationParserService {
 			[GameTag[GameTag.CONTROLLER]]: playerEntity.playerId,
 			[GameTag[GameTag.CARDTYPE]]: CardType.BATTLEGROUND_QUEST_REWARD,
 			[GameTag[GameTag.ZONE]]: Zone.PLAY,
-			[GameTag[GameTag.ENTITY_ID]]: Zone.PLAY,
+			[GameTag[GameTag.ENTITY_ID]]: entityId,
 			[GameTag[GameTag.TAG_SCRIPT_DATA_NUM_1]]: action.opponentRewardData,
 		});
 		return Entity.create({
-			id: action.opponentRewardEntityId,
-			cardID: action.opponentRewardCardId,
+			id: entityId,
+			cardID: cardId,
 			tags: tags,
 		} as Entity);
 	}
