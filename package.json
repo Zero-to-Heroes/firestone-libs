@@ -46,7 +46,7 @@
 		"eslint-loader": "^4.0.2",
 		"eslint-plugin-prettier": "^4.2.1",
 		"immutable": "^4.1.0",
-		"lodash-es": "^4.17.15",
+		"lodash-es": "^4.17.21",
 		"ng-packagr": "^15.0.1",
 		"prettier": "^3.2.5",
 		"protractor": "~7.0.0",
