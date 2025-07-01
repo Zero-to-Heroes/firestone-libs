@@ -22,6 +22,7 @@ import { DiscoverParser } from '../action/discover-parser';
 import { DiscoveryPickParser } from '../action/discovery-pick-parser';
 import { EndGameParser } from '../action/end-game-parser';
 import { FatigueDamageParser } from '../action/fatigue-damage-parser';
+import { LocationActivatedParser } from '../action/location-activated-parser';
 import { MinionDeathParser } from '../action/minion-death-parser';
 import { MulliganCardChoiceParser } from '../action/mulligan-card-choice-parser';
 import { MulliganCardParser } from '../action/mulligan-card-parser';
@@ -34,6 +35,7 @@ import { SecretRevealedParser } from '../action/secret-revealed-parser';
 import { StartOfMulliganParser } from '../action/start-of-mulligan-parser';
 import { StartTurnParser } from '../action/start-turn-parser';
 import { SummonsParser } from '../action/summons-parser';
+import { TradeParser } from '../action/trade-parser';
 import { AllCardsService } from '../all-cards.service';
 import { StateProcessorService } from '../state-processor.service';
 
@@ -41,7 +43,10 @@ import { StateProcessorService } from '../state-processor.service';
 	providedIn: 'root',
 })
 export class ActionParserService {
-	constructor(private allCards: AllCardsService, private stateProcessorService: StateProcessorService) {}
+	constructor(
+		private allCards: AllCardsService,
+		private stateProcessorService: StateProcessorService,
+	) {}
 
 	private registerActionParsers(config: ActionParserConfig): Parser[] {
 		return [
@@ -64,6 +69,8 @@ export class ActionParserService {
 			new SecretRevealedParser(this.allCards),
 			new AttachingEnchantmentParser(this.allCards, config),
 			new DamageParser(this.allCards),
+			new TradeParser(this.allCards),
+			new LocationActivatedParser(this.allCards),
 			new CardDiscardParser(this.allCards),
 			new OptionsParser(this.allCards),
 			new EndGameParser(this.allCards),
@@ -152,7 +159,7 @@ export class ActionParserService {
 		game: Game,
 	): readonly Action[] {
 		const currentTurn = game.turns.size - 1;
-		actionParsers.forEach(parser => {
+		actionParsers.forEach((parser) => {
 			if (parser.applies(item)) {
 				// When we perform an action, we want to show the result of the state updates until the next action is
 				// played.
@@ -203,7 +210,7 @@ export class ActionParserService {
 			}
 			const newEntities = actionsForTurn[i].entities ? actionsForTurn[i].entities : previousStateEntities;
 			const entitiesAfterDamageUpdate: Map<number, Entity> = newEntities
-				.map(entity => this.updateDamageForEntity(actionsForTurn[i], entity))
+				.map((entity) => this.updateDamageForEntity(actionsForTurn[i], entity))
 				.toMap();
 			newActionsForTurn.push(actionsForTurn[i].update(entitiesAfterDamageUpdate));
 		}

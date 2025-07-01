@@ -1,5 +1,6 @@
 import { BlockType, CardType, GameTag, Zone } from '@firestone-hs/reference-data';
 import { Map } from 'immutable';
+import uniq from 'lodash-es/uniq';
 import { Action } from '../../models/action/action';
 import { CardPlayedFromHandAction } from '../../models/action/card-played-from-hand-action';
 import { Entity } from '../../models/game/entity';
@@ -7,6 +8,7 @@ import { ActionHistoryItem } from '../../models/history/action-history-item';
 import { HistoryItem } from '../../models/history/history-item';
 import { TagChangeHistoryItem } from '../../models/history/tag-change-history-item';
 import { AllCardsService } from '../all-cards.service';
+import { ActionHelper } from './action-helper';
 import { Parser } from './parser';
 
 export class CardPlayedFromHandParser implements Parser {
@@ -74,7 +76,37 @@ export class CardPlayedFromHandParser implements Parser {
 		}
 	}
 
+	// For blood gems
 	public reduce(actions: readonly Action[]): readonly Action[] {
-		return actions;
+		return ActionHelper.combineActions<Action>(
+			actions,
+			(previous, current) => this.shouldMergeActions(previous, current),
+			(previous, current) => this.mergeActions(previous, current),
+		);
+	}
+
+	private shouldMergeActions(previousAction: Action, currentAction: Action): boolean {
+		if (previousAction instanceof CardPlayedFromHandAction && currentAction instanceof CardPlayedFromHandAction) {
+			// console.log('Merging card played from hand actions', previousAction, currentAction);
+			if (
+				previousAction.entities.get(previousAction.originId)?.getTag(GameTag.CARDTYPE) === CardType.SPELL &&
+				previousAction.entities.get(previousAction.originId)?.cardID ===
+					currentAction.entities.get(currentAction.originId)?.cardID
+			) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private mergeActions(previousAction: Action, currentAction: Action): Action {
+		return ActionHelper.mergeIntoFirstAction(previousAction, currentAction, {
+			entities: currentAction.entities,
+			originId: currentAction.originId,
+			targetIds: uniq([
+				...uniq(previousAction.targetIds || []),
+				...uniq(currentAction.targetIds || []),
+			]) as readonly number[],
+		} as CardPlayedFromHandAction);
 	}
 }

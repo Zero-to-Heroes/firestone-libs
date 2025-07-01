@@ -1,4 +1,4 @@
-import { GameTag, Zone } from '@firestone-hs/reference-data';
+import { CardType, GameTag, Zone } from '@firestone-hs/reference-data';
 import { Map } from 'immutable';
 import { Action } from '../../models/action/action';
 import { AttackAction } from '../../models/action/attack-action';
@@ -8,7 +8,13 @@ import { PowerTargetAction } from '../../models/action/power-target-action';
 import { Entity } from '../../models/game/entity';
 import { HistoryItem } from '../../models/history/history-item';
 import { TagChangeHistoryItem } from '../../models/history/tag-change-history-item';
-import { CardPlayedFromHandAction, FullEntityHistoryItem, GameEntity, GameHepler } from '../../models/models';
+import {
+	ActionButtonUsedAction,
+	CardPlayedFromHandAction,
+	FullEntityHistoryItem,
+	GameEntity,
+	GameHepler,
+} from '../../models/models';
 import { AllCardsService } from '../all-cards.service';
 import { ActionHelper } from './action-helper';
 import { Parser } from './parser';
@@ -31,6 +37,11 @@ export class DamageParser implements Parser {
 		if (!entity || entity.getTag(GameTag.ZONE) !== Zone.PLAY) {
 			return [];
 		}
+		// Ignore damage to locations
+		if (entity.getTag(GameTag.CARDTYPE) === CardType?.LOCATION) {
+			return [];
+		}
+
 		const previousDamageTag = entity.getTag(GameTag.DAMAGE);
 		const previousDamage = !previousDamageTag || previousDamageTag === -1 ? 0 : previousDamageTag;
 		const damageTaken = item.tag.value - previousDamage;
@@ -89,15 +100,23 @@ export class DamageParser implements Parser {
 	}
 
 	private shouldMergeActions(previousAction: Action, currentAction: Action): boolean {
-		if (!(currentAction instanceof DamageAction)) {
-			return false;
+		if (currentAction instanceof DamageAction) {
+			return (
+				previousAction instanceof DamageAction || // Merge all damages into a single action
+				previousAction instanceof AttackAction || // Add damage to the attack causing the damage
+				previousAction instanceof PowerTargetAction || // Add damages to the power causing the damage
+				previousAction instanceof ActionButtonUsedAction ||
+				previousAction instanceof CardPlayedFromHandAction // It's usually teh same "action"
+			);
+		} else if (currentAction instanceof HealingAction) {
+			return (
+				previousAction instanceof HealingAction || // Merge all heals into a single action
+				previousAction instanceof AttackAction || // Add heal to the attack causing the heal
+				previousAction instanceof PowerTargetAction || // Add heals to the power causing the heal
+				previousAction instanceof ActionButtonUsedAction || // Add heals to the power causing the heal
+				previousAction instanceof CardPlayedFromHandAction // It's usually teh same "action"
+			);
 		}
-		return (
-			previousAction instanceof DamageAction || // Merge all damages into a single action
-			previousAction instanceof AttackAction || // Add damage to the attack causing the damage
-			previousAction instanceof PowerTargetAction || // Add damages to the power causing the damage
-			previousAction instanceof CardPlayedFromHandAction // It's usually teh same "action"
-		);
 	}
 
 	private mergeActions(previousAction: Action, currentAction: Action): Action {

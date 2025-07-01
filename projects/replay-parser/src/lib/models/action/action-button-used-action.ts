@@ -28,18 +28,19 @@ export class ActionButtonUsedAction extends Action {
 		const verb = this.buildVerb(card);
 		let actionTarget = '';
 		if (this.targetIds && this.targetIds.length > 0) {
-			const targetCardIds = this.targetIds.map(entityId =>
+			const targetCardIds = this.targetIds.map((entityId) =>
 				ActionHelper.getCardId(this.entities, entityId, allEntitiesSoFar),
 			);
-			const cardIds = targetCardIds.map(cardId => this.allCards.getCard(cardId));
-			const targetCardNames = cardIds.some(card => !card || !card.name)
+			const cardIds = targetCardIds.map((cardId) => this.allCards.getCard(cardId));
+			const targetCardNames = cardIds.some((card) => !card || !card.name)
 				? `${cardIds.length} cards`
-				: cardIds.map(card => card.name).join(', ');
+				: cardIds.map((card) => card.name).join(', ');
 			actionTarget = ` on ${targetCardNames}`;
 		}
 		const textRaw = `\t${ownerName} ${verb} ${card.name}${actionTarget}`
 			// Sugar for Battlegrounds
 			.replace('uses Drag To Buy on', 'buys')
+			.replace('uses Drag To Buy Spell on', 'buys')
 			.replace('uses Drag To Sell on', 'sells');
 		return Object.assign(new ActionButtonUsedAction(this.allCards), this, {
 			textRaw,

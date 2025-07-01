@@ -1,14 +1,15 @@
-import { BlockType } from '@firestone-hs/reference-data';
+import { BlockType, CardIds } from '@firestone-hs/reference-data';
 import { Map } from 'immutable';
 import isEqual from 'lodash-es/isEqual';
 import uniq from 'lodash-es/uniq';
 import { Action } from '../../models/action/action';
 import { AttachingEnchantmentAction } from '../../models/action/attaching-enchantment-action';
 import { CardTargetAction } from '../../models/action/card-target-action';
+import { TradeAction } from '../../models/action/trade-action';
 import { Entity } from '../../models/game/entity';
 import { ActionHistoryItem } from '../../models/history/action-history-item';
 import { HistoryItem } from '../../models/history/history-item';
-import { ActionButtonUsedAction } from '../../models/models';
+import { ActionButtonUsedAction, CardPlayedFromHandAction } from '../../models/models';
 import { AllCardsService } from '../all-cards.service';
 import { ActionHelper } from './action-helper';
 import { Parser } from './parser';
@@ -38,7 +39,13 @@ export class CardTargetParser implements Parser {
 			return [];
 		}
 		// Remove the dummy effects
-		if (['DALA_744d'].indexOf(entity.cardID) !== -1) {
+		if (
+			[
+				'DALA_744d',
+				CardIds.BloodGemNoImpactToken,
+				CardIds.BloodGemNoImpactFromTeammateDnt_BGDUO20_GEM_No_Impact_Copy,
+			].includes(entity.cardID)
+		) {
 			return [];
 		}
 		const targetId = parseInt(item.node.attributes.target);
@@ -75,11 +82,19 @@ export class CardTargetParser implements Parser {
 		if (previousAction instanceof ActionButtonUsedAction) {
 			return previousAction.entityId === currentAction.originId;
 		}
+		if (previousAction instanceof TradeAction) {
+			return previousAction.originId === currentAction.originId;
+		}
 		if (previousAction instanceof AttachingEnchantmentAction && currentAction instanceof CardTargetAction) {
 			if (
 				previousAction.originId === currentAction.originId &&
 				isEqual(previousAction.targetIds, currentAction.targetIds)
 			) {
+				return true;
+			}
+		}
+		if (previousAction instanceof CardPlayedFromHandAction && currentAction instanceof CardTargetAction) {
+			if (previousAction.entityId === currentAction.originId) {
 				return true;
 			}
 		}
@@ -105,6 +120,17 @@ export class CardTargetParser implements Parser {
 					...uniq(currentAction.targetIds || []),
 				]) as readonly number[],
 			} as ActionButtonUsedAction);
+		} else if (previousAction instanceof CardPlayedFromHandAction) {
+			// // console.log('merging actions', previousAction, currentAction);
+			return ActionHelper.mergeIntoFirstAction(previousAction, currentAction, {
+				entities: currentAction.entities,
+				entityId: previousAction.entityId,
+				originId: currentAction.originId,
+				targetIds: uniq([
+					...uniq(previousAction.targetIds || []),
+					...uniq(currentAction.targetIds || []),
+				]) as readonly number[],
+			} as CardPlayedFromHandAction);
 		} else if (previousAction instanceof CardTargetAction) {
 			return CardTargetAction.create(
 				{
@@ -116,7 +142,7 @@ export class CardTargetParser implements Parser {
 				},
 				this.allCards,
 			);
-		} else if (previousAction instanceof AttachingEnchantmentAction) {
+		} else if (previousAction instanceof AttachingEnchantmentAction || previousAction instanceof TradeAction) {
 			return previousAction;
 		}
 	}

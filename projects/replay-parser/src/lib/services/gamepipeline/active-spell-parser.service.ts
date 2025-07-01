@@ -52,8 +52,8 @@ export class ActiveSpellParserService {
 		let activeSpell;
 		if (
 			action instanceof CardPlayedFromHandAction &&
-			action.entities.get(action.entityId) &&
-			action.entities.get(action.entityId).getTag(GameTag.CARDTYPE) === CardType.SPELL
+			action.entities.get(action.entityId)
+			//&& action.entities.get(action.entityId).getTag(GameTag.CARDTYPE) === CardType.SPELL
 		) {
 			activeSpell = action.entityId;
 		} else if (
